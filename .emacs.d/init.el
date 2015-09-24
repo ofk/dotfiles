@@ -221,3 +221,17 @@
             '(lambda ()
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
                )))
+
+;;------------------------------------------------------------------------------
+;; CSS/SCSS
+(use-package scss-mode :mode ("\\.scss$" . scss-mode)
+  :config
+  (setq css-indent-offset 2)
+  (setq scss-compile-at-save nil)
+  (add-to-list 'ac-modes 'scss-mode)
+  (add-hook 'scss-mode-hook
+            '(lambda ()
+               (setq comment-start "// ")
+               (setq comment-end "")
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               )))
