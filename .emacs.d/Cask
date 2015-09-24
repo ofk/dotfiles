@@ -18,6 +18,7 @@
 (depends-on "coffee-mode")
 (depends-on "scss-mode")
 (depends-on "stylus-mode")
+(depends-on "web-mode")
 (depends-on "haml-mode")
 (depends-on "jade-mode")
 (depends-on "php-mode")
