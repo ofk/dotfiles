@@ -19,3 +19,4 @@
 (depends-on "scss-mode")
 (depends-on "stylus-mode")
 (depends-on "haml-mode")
+(depends-on "jade-mode")
