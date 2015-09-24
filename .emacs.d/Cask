@@ -8,3 +8,4 @@
 (depends-on "anzu")
 
 (depends-on "markdown-mode+")
+(depends-on "yaml-mode")
