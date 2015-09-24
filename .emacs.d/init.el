@@ -7,6 +7,12 @@
 (eval-when-compile (require 'cl))
 
 ;;------------------------------------------------------------------------------
+;; Packages
+(when (or (require 'cask nil t)
+          (require 'cask "~/.cask/cask.el" t))
+  (cask-initialize))
+
+;;------------------------------------------------------------------------------
 ;; Encoding
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
