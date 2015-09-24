@@ -3,3 +3,4 @@
 
 (depends-on "use-package")
 (depends-on "auto-complete")
+(depends-on "undo-tree")

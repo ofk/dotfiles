@@ -103,3 +103,10 @@
   (require 'auto-complete-config)
   (ac-config-default)
   (global-auto-complete-mode t))
+
+;;------------------------------------------------------------------------------
+;; undo-tree.el
+(use-package undo-tree :ensure t :diminish undo-tree-mode
+  :config
+  (global-undo-tree-mode)
+  (global-set-key (kbd "C-M-_") 'undo-tree-redo))
