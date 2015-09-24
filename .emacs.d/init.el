@@ -157,3 +157,9 @@
 ;;------------------------------------------------------------------------------
 ;; YAML
 (use-package yaml-mode :mode ("\\.yml$" . yaml-mode))
+
+;;------------------------------------------------------------------------------
+;; JSON
+(use-package json-mode :mode ("\\.json$" . json-mode)
+  :config
+  (setq js-indent-level 2))
