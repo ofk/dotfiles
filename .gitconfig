@@ -1,0 +1,12 @@
+[user]
+    name = ofk
+    email = ofkjpn+github@gmail.com
+
+[core]
+    excludesfile = ~/.gitignore
+
+[color]
+    ui = auto
+
+[push]
+    default = current
