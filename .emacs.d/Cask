@@ -2,3 +2,4 @@
 (source melpa)
 
 (depends-on "use-package")
+(depends-on "auto-complete")

@@ -10,7 +10,7 @@
 ;; Packages
 (when (or (require 'cask nil t)
           (require 'cask "~/.cask/cask.el" t))
-  (cask-initialize))
+  (defconst my-bundle (cask-initialize)))
 (require 'use-package)
 
 ;;------------------------------------------------------------------------------
@@ -94,3 +94,12 @@
 ;; After save hook
 ;; add executable if script on save
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+
+;;------------------------------------------------------------------------------
+;; auto-complete.el
+(use-package auto-complete :ensure t :diminish auto-complete-mode
+  :config
+  (add-to-list 'ac-dictionary-directories (concat (cask-dependency-path my-bundle 'auto-complete) "/dict"))
+  (require 'auto-complete-config)
+  (ac-config-default)
+  (global-auto-complete-mode t))
