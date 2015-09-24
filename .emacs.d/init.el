@@ -245,3 +245,7 @@
             '(lambda ()
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
                )))
+
+;;------------------------------------------------------------------------------
+;; Haml
+(use-package haml-mode :mode ("\\.haml$" . haml-mode))
