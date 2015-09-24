@@ -163,3 +163,12 @@
 (use-package json-mode :mode ("\\.json$" . json-mode)
   :config
   (setq js-indent-level 2))
+
+;;------------------------------------------------------------------------------
+;; Go
+(use-package go-mode :mode ("\\.go$" . go-mode)
+  :config
+  (add-hook 'go-mode-hook
+            '(lambda ()
+               (add-hook 'before-save-hook 'gofmt-before-save)
+               )))
