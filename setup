@@ -1,6 +1,9 @@
 #!/bin/bash
 
-cd $(dirname $0)
+DOTFILES_DIR=$(dirname $0)
+
+# create symbolic link files
+cd $DOTFILES_DIR
 
 for filename in .?*; do
     case $filename in
@@ -8,7 +11,14 @@ for filename in .?*; do
 	    continue;;
         *)
             echo "${PWD}/${filename} -> ${HOME}/${filename}"
+            rm -rf "${HOME}/${filename}"
             ln -Fis "${PWD}/${filename}" $HOME
             ;;
     esac
 done
+
+# update emacs lisps
+cd "${DOTFILES_DIR}/.emacs.d"
+
+echo "download elisp"
+cask
