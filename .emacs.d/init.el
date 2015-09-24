@@ -110,3 +110,10 @@
   :config
   (global-undo-tree-mode)
   (global-set-key (kbd "C-M-_") 'undo-tree-redo))
+
+;;------------------------------------------------------------------------------
+;; smartparens.el
+(use-package smartparens :ensure t :diminish smartparens-mode
+  :config
+  (smartparens-global-mode t)
+  (setq sp-highlight-pair-overlay nil))
