@@ -5,6 +5,7 @@
 (depends-on "auto-complete")
 (depends-on "undo-tree")
 (depends-on "smartparens")
+(depends-on "smart-newline")
 (depends-on "anzu")
 
 (depends-on "markdown-mode+")
@@ -12,3 +13,4 @@
 (depends-on "json-mode")
 (depends-on "go-mode")
 (depends-on "enh-ruby-mode")
+(depends-on "ruby-end")

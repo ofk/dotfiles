@@ -119,6 +119,10 @@
   (setq sp-highlight-pair-overlay nil))
 
 ;;------------------------------------------------------------------------------
+;; smart-newline.el
+(use-package smart-newline :ensure t :diminish smart-newline-mode)
+
+;;------------------------------------------------------------------------------
 ;; anzu.el
 (use-package anzu :ensure t :diminish anzu-mode
   :config
@@ -187,5 +191,8 @@
   (add-to-list 'ac-modes 'enh-ruby-mode)
   (add-hook 'enh-ruby-mode-hook
             '(lambda ()
+               (electric-pair-mode t)
+               (electric-indent-mode t)
+               (electric-layout-mode t)
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/ruby-mode"))
                )))
