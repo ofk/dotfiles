@@ -172,3 +172,20 @@
             '(lambda ()
                (add-hook 'before-save-hook 'gofmt-before-save)
                )))
+
+;;------------------------------------------------------------------------------
+;; Ruby
+(use-package enh-ruby-mode
+  :mode (("\\.rb$" . enh-ruby-mode)
+         ("\\.rake$" . enh-ruby-mode)
+         ("\\.gemspec$" . enh-ruby-mode)
+         ("Capfile$" . enh-ruby-mode)
+         ("Gemfile$" . enh-ruby-mode)
+         ("Rakefile$" . enh-ruby-mode))
+  :config
+  (setq enh-ruby-add-encoding-comment-on-save nil)
+  (add-to-list 'ac-modes 'enh-ruby-mode)
+  (add-hook 'enh-ruby-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/ruby-mode"))
+               )))
