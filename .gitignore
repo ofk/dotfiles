@@ -70,3 +70,11 @@ tramp
 
 # auto-complete
 ac-comphist.dat
+
+## commands files
+/,/
+/.bundle/
+/vendor/bundle
+/npm-debug.log*
+/node_modules
+/bower_modules
