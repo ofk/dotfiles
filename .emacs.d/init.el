@@ -196,3 +196,17 @@
                (electric-layout-mode t)
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/ruby-mode"))
                )))
+
+;;------------------------------------------------------------------------------
+;; JavaScript
+(use-package js2-mode :mode ("\\.js$" . js2-mode)
+  :config
+  (setq js2-basic-offset 2)
+  (setq js2-highlight-level 3)
+  (setq js2-include-node-externs t)
+  (setq js2-strict-inconsistent-return-warning nil)
+  (add-to-list 'ac-modes 'js2-mode)
+  (add-hook 'js2-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))

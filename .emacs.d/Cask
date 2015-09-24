@@ -14,3 +14,4 @@
 (depends-on "go-mode")
 (depends-on "enh-ruby-mode")
 (depends-on "ruby-end")
+(depends-on "js2-mode")
