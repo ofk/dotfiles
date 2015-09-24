@@ -137,3 +137,7 @@
              (c-set-offset 'innamespace 0)
              (local-set-key "\C-m" 'reindent-then-newline-and-indent)
              ))
+
+;;------------------------------------------------------------------------------
+;; Lisp
+(add-to-list 'auto-mode-alist '("Cask$" . lisp-mode))
