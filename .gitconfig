@@ -10,3 +10,8 @@
 
 [push]
     default = current
+
+[alias]
+    br = branch
+    co = checkout
+    cm = commit --message
