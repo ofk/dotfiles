@@ -235,3 +235,13 @@
                (setq comment-end "")
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
                )))
+
+;;------------------------------------------------------------------------------
+;; Stylus
+(use-package stylus-mode :mode ("\\.styl$" . stylus-mode)
+  :config
+  (add-to-list 'ac-modes 'stylus-mode)
+  (add-hook 'stylus-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               )))
