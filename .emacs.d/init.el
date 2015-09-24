@@ -125,3 +125,15 @@
   (global-anzu-mode 1)
   (setq anzu-deactivate-region t)
   (setq anzu-search-threshold 999))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Majar mode
+
+;;------------------------------------------------------------------------------
+;; C/C++
+(add-hook 'c-mode-common-hook
+          '(lambda ()
+             (c-set-style "gnu")
+             (c-set-offset 'innamespace 0)
+             (local-set-key "\C-m" 'reindent-then-newline-and-indent)
+             ))
