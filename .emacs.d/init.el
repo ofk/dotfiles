@@ -253,3 +253,12 @@
 ;;------------------------------------------------------------------------------
 ;; Jade
 (use-package jade-mode :mode ("\\.jade$" . jade-mode))
+
+;;------------------------------------------------------------------------------
+;; PHP
+(use-package php-mode :mode ("\\.php$" . php-mode)
+  :config
+  (add-hook 'php-mode-hook
+            '(lambda ()
+               (php-enable-drupal-coding-style)
+               )))
