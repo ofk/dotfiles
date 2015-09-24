@@ -6,3 +6,5 @@
 (depends-on "undo-tree")
 (depends-on "smartparens")
 (depends-on "anzu")
+
+(depends-on "markdown-mode+")
