@@ -117,3 +117,11 @@
   :config
   (smartparens-global-mode t)
   (setq sp-highlight-pair-overlay nil))
+
+;;------------------------------------------------------------------------------
+;; anzu.el
+(use-package anzu :ensure t :diminish anzu-mode
+  :config
+  (global-anzu-mode 1)
+  (setq anzu-deactivate-region t)
+  (setq anzu-search-threshold 999))
