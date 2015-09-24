@@ -11,6 +11,7 @@
 (when (or (require 'cask nil t)
           (require 'cask "~/.cask/cask.el" t))
   (cask-initialize))
+(require 'use-package)
 
 ;;------------------------------------------------------------------------------
 ;; Encoding
