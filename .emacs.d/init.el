@@ -130,6 +130,14 @@
   (setq anzu-deactivate-region t)
   (setq anzu-search-threshold 999))
 
+;;------------------------------------------------------------------------------
+;; Rainbow mode
+(use-package rainbow-mode :defer t ;:diminish rainbow-mode
+  :config
+  (add-to-list 'rainbow-html-colors-major-mode-list 'scss-mode)
+  (add-to-list 'rainbow-html-colors-major-mode-list 'stylus-mode)
+  (add-to-list 'rainbow-html-colors-major-mode-list 'php-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Majar mode
 
@@ -234,7 +242,8 @@
                (setq comment-start "// ")
                (setq comment-end "")
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
-               )))
+               ))
+  (add-hook 'scss-mode-hook 'rainbow-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Stylus
@@ -244,7 +253,8 @@
   (add-hook 'stylus-mode-hook
             '(lambda ()
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
-               )))
+               ))
+  (add-hook 'stylus-mode-hook 'rainbow-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Web (HTML)
@@ -254,6 +264,7 @@
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-auto-closing t)
+  (setq web-mode-enable-css-colorization t)
   (custom-set-faces
    '(web-mode-doctype-face ((t :inherit font-lock-constant-face)))
    '(web-mode-html-tag-face ((t :inherit font-lock-keyword-face)))
@@ -275,4 +286,5 @@
   (add-hook 'php-mode-hook
             '(lambda ()
                (php-enable-drupal-coding-style)
-               )))
+               ))
+  (add-hook 'php-mode-hook 'rainbow-mode))

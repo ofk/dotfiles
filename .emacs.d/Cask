@@ -7,6 +7,7 @@
 (depends-on "smartparens")
 (depends-on "smart-newline")
 (depends-on "anzu")
+(depends-on "rainbow-mode")
 
 (depends-on "markdown-mode+")
 (depends-on "yaml-mode")
