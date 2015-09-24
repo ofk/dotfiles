@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd $(dirname $0)
+
+for filename in .?*; do
+    case $filename in
+	'..' | '.git' | '.DS_Store')
+	    continue;;
+        *)
+            echo "${PWD}/${filename} -> ${HOME}/${filename}"
+            ln -Fis "${PWD}/${filename}" $HOME
+            ;;
+    esac
+done
