@@ -1,0 +1,14 @@
+## brew
+if type brew >/dev/null 2>&1; then
+    BREW_DIR=$(brew --prefix)
+    add_path "${BREW_DIR}/bin"
+    require_script \
+        "${BREW_DIR}/etc/bash_completion" \
+        "${BREW_DIR}/opt/git/etc/bash_completion.d/git-completion.bash" \
+        "${BREW_DIR}/opt/rbenv/completions/rbenv.bash" \
+        "${BREW_DIR}/opt/pyenv/completions/pyenv.bash" \
+        "${BREW_DIR}/opt/nodebrew/etc/bash_completion.d/nodebrew"
+fi
+
+## coteditor
+alias coteditor='open -a CotEditor'
