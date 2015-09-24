@@ -210,3 +210,14 @@
             '(lambda ()
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
                )))
+
+;;------------------------------------------------------------------------------
+;; CoffeeScript
+(use-package coffee-mode :mode ("\\.coffee$" . coffee-mode)
+  :config
+  (setq coffee-tab-width 2)
+  (add-to-list 'ac-modes 'coffee-mode)
+  (add-hook 'coffee-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))
