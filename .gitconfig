@@ -1,6 +1,5 @@
-[user]
-    name = ofk
-    email = ofkjpn+github@gmail.com
+[include]
+    path = ~/.gitconfig.local
 
 [core]
     excludesfile = ~/.gitignore

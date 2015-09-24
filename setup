@@ -7,8 +7,10 @@ cd $DOTFILES_DIR
 
 for filename in .?*; do
     case $filename in
-	'..' | '.git' | '.DS_Store')
-	    continue;;
+        '..' | '.git' | '.DS_Store')
+            continue;;
+        *.example)
+            continue;;
         *)
             echo "${PWD}/${filename} -> ${HOME}/${filename}"
             rm -rf "${HOME}/${filename}"

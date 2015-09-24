@@ -156,11 +156,11 @@
 
 ;;------------------------------------------------------------------------------
 ;; Conf
-(add-to-list 'auto-mode-alist '("config$" . conf-mode))
+(add-to-list 'auto-mode-alist '("config\\(\\.[a-zA-Z0-9_]+\\)*$" . conf-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Shell
-(add-to-list 'auto-mode-alist '("bashrc\\(\\.[a-zA-Z0-9_]+\\)?$" . sh-mode))
+(add-to-list 'auto-mode-alist '("bashrc\\(\\.[a-zA-Z0-9_]+\\)*$" . sh-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Markdown
