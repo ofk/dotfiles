@@ -86,10 +86,7 @@ else
 fi
 
 alias ls="ls ${LS_OPTIONS}"
-alias la='ls -a'
-alias lf='ls -F'
-alias ll='ls -l'
-alias lg='ls -g'
+alias ll='ls -lah'
 alias su='su -l'
 alias cp='cp -iv'
 alias mv='mv -iv'
