@@ -21,5 +21,5 @@
     lv = log --graph --abbrev-commit --date=short --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cd %C(blue)%cn%C(red)%d %C(reset)%s'
     d = !git diff --ignore-space-change --histogram "$@" 2>/dev/null || git diff --ignore-space-change "$@"
 
-    sync = !git fetch -p && git pull && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop)
+    sync = !git fetch -p && git pull origin $(git rev-parse --abbrev-ref @) && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop)
     cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
