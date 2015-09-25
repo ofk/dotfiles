@@ -22,7 +22,7 @@ for filename in .?*; do
 done
 
 # update emacs lisps
-cd "${DOTFILES_DIR}/.emacs.d"
+cd "${HOME}/.emacs.d"
 
 echo "download elisp"
 cask
