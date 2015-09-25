@@ -1,0 +1,47 @@
+#!/bin/bash
+function install_git {
+    tmpfile=$(mktemp 2>/dev/null||mktemp -t tmp)
+    rm -rf $tmpfile
+    mkdir -p $tmpfile
+    trap "[[ $tmpfile ]] && rm -rf $tmpfile" 0
+
+    curl -L "https://www.kernel.org/pub/software/scm/git/git-${1}.tar.gz" | tar xz -C $tmpfile --strip=1 --no-same-permission --no-same-owner
+    cd $tmpfile
+    make prefix=${2} all
+    make prefix=${2} install
+}
+
+function install_emacs {
+    tmpfile=$(mktemp 2>/dev/null||mktemp -t tmp)
+    rm -rf $tmpfile
+    mkdir -p $tmpfile
+    trap "[[ $tmpfile ]] && rm -rf $tmpfile" 0
+
+    curl -L "http://ftp.gnu.org/pub/gnu/emacs/emacs-${1}.tar.gz" | tar xz -C $tmpfile --strip=1 --no-same-permission --no-same-owner
+    cd $tmpfile
+    ./configure --prefix=${2} --without-x --without-selinux
+    make
+    make install
+}
+
+function install_cask {
+    curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+}
+
+default_prefix=${DEFAULT_PREFIX:-$HOME/local}
+git_version=${GIT_VERSION:-2.5.3}
+git_prefix=${GIT_PREFIX:-$default_prefix}
+emacs_version=${EMACS_VERSION:-24.5}
+emacs_prefix=${EMACS_PREFIX:-$default_prefix}
+
+if [ "$(uname)" = 'Linux' ]; then
+    if ! type git >/dev/null 2>&1 || [ "$(git --version)" != "git version ${git_version}" ]; then
+        install_git $git_version $git_prefix
+    fi
+    if ! type emacs-${emacs_version} >/dev/null 2>&1; then
+        install_emacs $emacs_version $emacs_prefix
+    fi
+    if ! type cask >/dev/null 2>&1; then
+        install_cask
+    fi
+fi
