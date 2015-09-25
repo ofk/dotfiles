@@ -10,6 +10,8 @@ for filename in .?*; do
         '..' | '.git' | '.DS_Store')
             continue;;
         *.example)
+            echo "${PWD}/${filename} -> ${HOME}/${filename%.*}"
+            cp -i "${PWD}/${filename}" "${HOME}/${filename%.*}"
             continue;;
         *)
             echo "${PWD}/${filename} -> ${HOME}/${filename}"
