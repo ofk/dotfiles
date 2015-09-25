@@ -80,9 +80,9 @@ export HISTIGNORE="?:??:???:exit"
 
 ## Common aliases
 if type dircolors >/dev/null 2>&1; then
-    LS_OPTIONS='--show-control-chars --color=auto -F -v';
+    LS_OPTIONS='--show-control-chars --color=auto -F -v'
 else
-    LS_OPTIONS='-FGw';
+    LS_OPTIONS='-FGw'
 fi
 
 alias ls="ls ${LS_OPTIONS}"
