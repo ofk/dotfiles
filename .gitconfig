@@ -11,6 +11,15 @@
     default = current
 
 [alias]
-    br = branch
+    br = branch -a
     co = checkout
     cm = commit --message
+    st = status --short --branch
+
+    lg = log --stat --abbrev-commit --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cr %C(blue)%cn%C(red)%d %C(reset)%s %C(cyan)%b'
+    lp = log --patch --ignore-space-change --abbrev-commit --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cr %C(blue)%cn%C(red)%d %C(reset)%s %C(cyan)%b'
+    lv = log --graph --abbrev-commit --date=short --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cd %C(blue)%cn%C(red)%d %C(reset)%s'
+    d = diff --ignore-space-change --histogram
+
+    sync = !git fetch -p && git pull && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop)
+    cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
