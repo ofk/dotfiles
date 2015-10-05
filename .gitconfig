@@ -11,7 +11,7 @@
     default = current
 
 [alias]
-    br = branch -a
+    br = branch
     co = checkout
     cm = commit --message
     st = status --short --branch
