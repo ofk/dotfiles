@@ -1,0 +1,14 @@
+## github/gitignore/Global/OSX.gitignore
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+## github/gitignore/Global/Emacs.gitignore
+*~
+\#*\#
+.\#*
+
+## commands files
+/,/
+/npm-debug.log
