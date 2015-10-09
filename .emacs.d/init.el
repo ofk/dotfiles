@@ -187,23 +187,43 @@
 
 ;;------------------------------------------------------------------------------
 ;; Ruby
-(use-package enh-ruby-mode
-  :mode (("\\.rb$" . enh-ruby-mode)
-         ("\\.rake$" . enh-ruby-mode)
-         ("\\.gemspec$" . enh-ruby-mode)
-         ("Capfile$" . enh-ruby-mode)
-         ("Gemfile$" . enh-ruby-mode)
-         ("Rakefile$" . enh-ruby-mode))
+;; cf. http://blog.10rane.com/2014/09/01/set-up-ruby-mode-of-emacs/
+(use-package ruby-mode
+  :mode (("\\.rb$" . ruby-mode)
+         ("\\.rake$" . ruby-mode)
+         ("\\.gemspec$" . ruby-mode)
+         ("Capfile$" . ruby-mode)
+         ("Gemfile$" . ruby-mode)
+         ("Rakefile$" . ruby-mode))
   :config
-  (setq enh-ruby-add-encoding-comment-on-save nil)
-  (add-to-list 'ac-modes 'enh-ruby-mode)
-  (add-hook 'enh-ruby-mode-hook
+  (setq ruby-deep-indent-paren-style nil)
+  (defadvice ruby-indent-line (after unindent-closing-paren activate)
+    (let ((column (current-column))
+          indent offset)
+      (save-excursion
+        (back-to-indentation)
+        (let ((state (syntax-ppss)))
+          (setq offset (- column (current-column)))
+          (when (and (eq (char-after) ?\))
+                     (not (zerop (car state))))
+            (goto-char (cadr state))
+            (setq indent (current-indentation)))))
+      (when indent
+        (indent-line-to indent)
+        (when (> offset 0) (forward-char offset)))))
+  (add-to-list 'ac-modes 'ruby-mode)
+  (add-hook 'ruby-mode-hook
             '(lambda ()
                (electric-pair-mode t)
                (electric-indent-mode t)
                (electric-layout-mode t)
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/ruby-mode"))
-               )))
+               ))
+  )
+(use-package ruby-end :diminish ruby-end-mode)
+(use-package ruby-block :diminish ruby-block-mode
+  :config
+  (ruby-block-mode t)
+  (setq ruby-block-highlight-toggle t))
 
 ;;------------------------------------------------------------------------------
 ;; JavaScript
