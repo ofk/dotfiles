@@ -232,7 +232,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; CSS/SCSS
-(use-package scss-mode :mode ("\\.scss$" . scss-mode)
+(use-package scss-mode :mode ("\\.s?css$" . scss-mode)
   :config
   (setq css-indent-offset 2)
   (setq scss-compile-at-save nil)
