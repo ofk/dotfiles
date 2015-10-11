@@ -17,7 +17,7 @@
     st = status --short --branch
 
     lg = log --stat --abbrev-commit --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cr %C(blue)%cn%C(red)%d %C(reset)%s %C(cyan)%b'
-    lp = log --patch --ignore-space-change --abbrev-commit --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cr %C(blue)%cn%C(red)%d %C(reset)%s %C(cyan)%b'
+    lp = log --patch --find-renames --ignore-space-change --abbrev-commit --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cr %C(blue)%cn%C(red)%d %C(reset)%s %C(cyan)%b'
     lv = log --graph --abbrev-commit --date=short --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cd %C(blue)%cn%C(red)%d %C(reset)%s'
     d = diff --ignore-space-change --histogram
 
