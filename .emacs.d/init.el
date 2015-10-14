@@ -214,7 +214,7 @@
   (add-to-list 'ac-modes 'ruby-mode)
   (add-hook 'ruby-mode-hook
             '(lambda ()
-               (electric-pair-mode t)
+               ; (electric-pair-mode t)
                (electric-indent-mode t)
                (electric-layout-mode t)
                ))
