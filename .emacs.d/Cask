@@ -21,6 +21,7 @@
 (depends-on "scss-mode")
 (depends-on "stylus-mode")
 (depends-on "web-mode")
+(depends-on "emmet-mode")
 (depends-on "haml-mode")
 (depends-on "jade-mode")
 (depends-on "php-mode")

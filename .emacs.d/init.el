@@ -138,6 +138,7 @@
   (add-to-list 'rainbow-html-colors-major-mode-list 'stylus-mode)
   (add-to-list 'rainbow-html-colors-major-mode-list 'php-mode))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Majar mode
 
@@ -289,7 +290,13 @@
    '(web-mode-doctype-face ((t :inherit font-lock-constant-face)))
    '(web-mode-html-tag-face ((t :inherit font-lock-keyword-face)))
    '(web-mode-html-attr-name-face ((t :inherit font-lock-constant-face)))
-   ))
+   )
+  (add-hook 'web-mode-hook
+            '(lambda ()
+               (setq emmet-preview-default nil) ;don't show preview when expand code
+               (emmet-mode)
+               )))
+(use-package emmet-mode :ensure t :diminish emmet-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Haml
