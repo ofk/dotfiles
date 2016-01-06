@@ -24,6 +24,7 @@
 ;; http://d.hatena.ne.jp/yascentur/20111126/1322267557
 (global-set-key "\C-m" 'newline-and-indent)
 (global-set-key "\C-j" 'newline)
+(global-set-key "\C-ce" 'next-error)
 
 ;;------------------------------------------------------------------------------
 ;; View
