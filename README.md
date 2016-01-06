@@ -8,5 +8,6 @@ There are my configuration files.
 
 ```bash
 $ git clone git://github.com/ofk/.dotfiles.git
+$ ./.dotfiles/setup cask
 $ ./.dotfiles/setup
 ```
