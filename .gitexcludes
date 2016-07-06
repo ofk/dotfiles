@@ -12,3 +12,4 @@
 ## commands files
 /,/
 /npm-debug.log
+/vendor/bundle
