@@ -253,6 +253,12 @@
                )))
 
 ;;------------------------------------------------------------------------------
+;; TypeScript
+(use-package typescript-mode :mode ("\\.ts$" . typescript-mode)
+  :config
+  (setq typescript-indent-level 2))
+
+;;------------------------------------------------------------------------------
 ;; CSS/SCSS
 (use-package scss-mode :mode ("\\.s?css$" . scss-mode)
   :config

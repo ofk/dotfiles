@@ -18,6 +18,7 @@
 (depends-on "ruby-block")
 (depends-on "js2-mode")
 (depends-on "coffee-mode")
+(depends-on "typescript-mode")
 (depends-on "scss-mode")
 (depends-on "stylus-mode")
 (depends-on "web-mode")
