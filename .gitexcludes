@@ -12,5 +12,6 @@
 ## commands files
 /,/
 /npm-debug.log
+/node_modules
 /.bundle
 /vendor/bundle
