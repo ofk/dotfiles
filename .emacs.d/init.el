@@ -241,6 +241,18 @@
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
                )))
 
+(use-package js2-mode :mode ("\\.jsx$" . js2-jsx-mode)
+  :config
+  (setq js2-basic-offset 2)
+  (setq js2-highlight-level 3)
+  (setq js2-include-node-externs t)
+  (setq js2-strict-inconsistent-return-warning nil)
+  (add-to-list 'ac-modes 'js2-jsx-mode)
+  (add-hook 'js2-jsx-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))
+
 ;;------------------------------------------------------------------------------
 ;; CoffeeScript
 (use-package coffee-mode :mode ("\\.coffee$" . coffee-mode)
