@@ -270,6 +270,19 @@
   :config
   (setq typescript-indent-level 2))
 
+(use-package web-mode :mode ("\\.tsx$" . web-mode)
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-auto-closing t)
+  (setq web-mode-enable-css-colorization t)
+  (custom-set-faces
+   '(web-mode-doctype-face ((t :inherit font-lock-constant-face)))
+   '(web-mode-html-tag-face ((t :inherit font-lock-keyword-face)))
+   '(web-mode-html-attr-name-face ((t :inherit font-lock-constant-face)))
+   ))
+
 ;;------------------------------------------------------------------------------
 ;; CSS/SCSS
 (use-package scss-mode :mode ("\\.s?css$" . scss-mode)
