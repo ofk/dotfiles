@@ -1,36 +1,12 @@
 #!/bin/bash
 MODE=${1:-default}
 
-function install_git {
-    tmpfile=$(mktemp 2>/dev/null||mktemp -t tmp)
-    rm -rf $tmpfile
-    mkdir -p $tmpfile
-    trap "[[ $tmpfile ]] && rm -rf $tmpfile" 0
-
-    curl -L "https://www.kernel.org/pub/software/scm/git/git-${1}.tar.gz" | tar xz -C $tmpfile --strip=1 --no-same-permission --no-same-owner
-    cd $tmpfile
-    make prefix=${2} all
-    make prefix=${2} install
-}
-
-function install_emacs {
-    tmpfile=$(mktemp 2>/dev/null||mktemp -t tmp)
-    rm -rf $tmpfile
-    mkdir -p $tmpfile
-    trap "[[ $tmpfile ]] && rm -rf $tmpfile" 0
-
-    curl -L "http://ftp.gnu.org/pub/gnu/emacs/emacs-${1}.tar.gz" | tar xz -C $tmpfile --strip=1 --no-same-permission --no-same-owner
-    cd $tmpfile
-    ./configure --prefix=${2} --without-x --without-selinux
-    make
-    make install
-}
-
 function install_cask {
+    # cf. https://github.com/cask/cask
     curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 }
 
-function setup_default {
+function copy_config {
     echo "Create symbolic link files"
     cd $(dirname $0)
 
@@ -49,7 +25,13 @@ function setup_default {
                 ;;
         esac
     done
+}
+
+function setup_default {
+    copy_config
     echo ""
+
+    source "${HOME}/.bashrc"
 
     echo "Run cask"
     cd "${HOME}/.emacs.d"
@@ -57,14 +39,11 @@ function setup_default {
 }
 
 case $MODE in
-    git)
-        install_git ${2:-2.5.3} ${3:-$HOME/local}
-        ;;
-    emacs)
-        install_emacs ${2:-24.5} ${3:-$HOME/local}
-        ;;
     cask)
         install_cask
+        ;;
+    config)
+        copy_config
         ;;
     default)
         setup_default
