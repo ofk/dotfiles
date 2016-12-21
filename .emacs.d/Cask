@@ -26,3 +26,4 @@
 (depends-on "haml-mode")
 (depends-on "jade-mode")
 (depends-on "php-mode")
+(depends-on "processing-mode")
