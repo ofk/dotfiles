@@ -24,6 +24,6 @@
 (depends-on "web-mode")
 (depends-on "emmet-mode")
 (depends-on "haml-mode")
-(depends-on "pug-mode")
+(depends-on "jade-mode")
 (depends-on "php-mode")
 (depends-on "processing-mode")
