@@ -3,6 +3,13 @@
 
 ;;------------------------------------------------------------------------------
 ;; cl
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (require 'cl-lib)
 (eval-when-compile (require 'cl))
 
@@ -229,19 +236,19 @@
 
 ;;------------------------------------------------------------------------------
 ;; JavaScript
-(use-package js2-mode :mode ("\\.js$" . js2-mode)
-  :config
-  (setq js2-basic-offset 2)
-  (setq js2-highlight-level 3)
-  (setq js2-include-node-externs t)
-  (setq js2-strict-inconsistent-return-warning nil)
-  (add-to-list 'ac-modes 'js2-mode)
-  (add-hook 'js2-mode-hook
-            '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
-               )))
+;; (use-package js2-mode :mode ("\\.js$" . js2-mode)
+;;   :config
+;;   (setq js2-basic-offset 2)
+;;   (setq js2-highlight-level 3)
+;;   (setq js2-include-node-externs t)
+;;   (setq js2-strict-inconsistent-return-warning nil)
+;;   (add-to-list 'ac-modes 'js2-mode)
+;;   (add-hook 'js2-mode-hook
+;;             '(lambda ()
+;;                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+;;                )))
 
-(use-package js2-mode :mode ("\\.jsx$" . js2-jsx-mode)
+(use-package js2-mode :mode ("\\.jsx?$" . js2-jsx-mode)
   :config
   (setq js2-basic-offset 2)
   (setq js2-highlight-level 3)
@@ -347,3 +354,7 @@
                (php-enable-drupal-coding-style)
                ))
   (add-hook 'php-mode-hook 'rainbow-mode))
+
+;;------------------------------------------------------------------------------
+;; Processing
+(use-package processing-mode :mode ("\\.pde$" . processing-mode))
