@@ -7,10 +7,7 @@ if type brew >/dev/null 2>&1; then
     export LD_LIBRARY_PATH="${BREW_DIR}/lib:/usr/lib"
     require_script \
         "${BREW_DIR}/etc/bash_completion" \
-        "${BREW_DIR}/opt/git/etc/bash_completion.d/git-completion.bash" \
-        "${BREW_DIR}/opt/rbenv/completions/rbenv.bash" \
-        "${BREW_DIR}/opt/pyenv/completions/pyenv.bash" \
-        "${BREW_DIR}/opt/nodebrew/etc/bash_completion.d/nodebrew"
+        "${BREW_DIR}/opt/git/etc/bash_completion.d/git-completion.bash"
 fi
 
 ## coteditor
