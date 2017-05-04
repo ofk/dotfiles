@@ -7,9 +7,15 @@ There are my configuration files.
 ## How to use
 
 ```bash
-$ git clone git://github.com/ofk/dotfiles.git ~/.dotfiles
+$ git clone git@github.com:ofk/dotfiles.git ~/.dotfiles
 $ ~/.dotfiles/setup
 ```
+
+### Prepare on Linux
+
+1. Install git, emacs and recently bash
+  - `sudo apt install -y git emacs bash bash-completion`
+1. Install [Cask](https://github.com/cask/cask)
 
 ### Prepare on Mac
 
