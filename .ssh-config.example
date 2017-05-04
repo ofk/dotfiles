@@ -1,0 +1,43 @@
+ForwardAgent yes
+AddKeysToAgent yes
+UseKeychain yes
+
+# vagrant
+Host vagrant-*
+  HostName 127.0.0.1
+  User ubuntu
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  LogLevel FATAL
+
+# webservice
+Host github-*
+  HostName github.com
+  Port 22
+  User git
+  TCPKeepAlive yes
+  IdentitiesOnly yes
+
+Host gist-github-*
+  HostName gist.github.com
+  Port 22
+  User git
+  TCPKeepAlive yes
+  IdentitiesOnly yes
+
+Host bitbucket-*
+  HostName bitbucket.org
+  Port 22
+  User git
+  TCPKeepAlive yes
+  IdentitiesOnly yes
+
+Host heroku-*
+  HostName heroku.com
+  Port 22
+  User git
+  TCPKeepAlive yes
+  IdentitiesOnly yes
