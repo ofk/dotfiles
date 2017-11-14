@@ -240,8 +240,8 @@
   :config
   (setq js-indent-level 2)
   (setq js2-strict-trailing-comma-warning nil)
-  (add-to-list 'ac-modes 'rjsx-jsx-mode)
-  (add-hook 'rjsx-jsx-mode-hook
+  (add-to-list 'ac-modes 'rjsx-mode)
+  (add-hook 'rjsx-mode-hook
             '(lambda ()
                (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
                )))
