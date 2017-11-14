@@ -239,6 +239,7 @@
 (use-package rjsx-mode :mode ("\\.jsx?$" . rjsx-mode)
   :config
   (setq js-indent-level 2)
+  (setq js-switch-indent-offset 2)
   (setq js2-strict-trailing-comma-warning nil)
   (add-to-list 'ac-modes 'rjsx-mode)
   (add-hook 'rjsx-mode-hook
