@@ -11,8 +11,16 @@
 
 ## commands files
 /,/
+
+## node
 /npm-debug.log
 /node_modules
+
+## ruby
 /.bundle
 /vendor/bundle
+
+## python
 /.python-version
+__pycache__/
+*.egg-info/
