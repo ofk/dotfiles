@@ -104,6 +104,17 @@
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
 
 ;;------------------------------------------------------------------------------
+;; Auto revert file
+(global-auto-revert-mode t)
+
+;;------------------------------------------------------------------------------
+;; Custom file
+;; http://extra-vision.blogspot.com/2016/10/emacs25-package-selected-packages.html
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;;------------------------------------------------------------------------------
 ;; auto-complete.el
 (use-package auto-complete :ensure t :diminish auto-complete-mode
   :config
@@ -151,6 +162,10 @@
 ;; Majar mode
 
 ;;------------------------------------------------------------------------------
+;; Lisp
+(add-to-list 'auto-mode-alist '("Cask$" . lisp-mode))
+
+;;------------------------------------------------------------------------------
 ;; C/C++
 (add-hook 'c-mode-common-hook
           '(lambda ()
@@ -160,30 +175,36 @@
              ))
 
 ;;------------------------------------------------------------------------------
-;; Lisp
-(add-to-list 'auto-mode-alist '("Cask$" . lisp-mode))
+;; Shell
+(add-to-list 'auto-mode-alist '("bashrc\\(\\.[a-zA-Z0-9_]+\\)*$" . sh-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Conf
 (add-to-list 'auto-mode-alist '("config\\(\\.[a-zA-Z0-9_]+\\)*$" . conf-mode))
 
 ;;------------------------------------------------------------------------------
-;; Shell
-(add-to-list 'auto-mode-alist '("bashrc\\(\\.[a-zA-Z0-9_]+\\)*$" . sh-mode))
-
-;;------------------------------------------------------------------------------
-;; Markdown
-(use-package markdown-mode :mode ("\\.md$" . gfm-mode))
-
-;;------------------------------------------------------------------------------
-;; YAML
-(use-package yaml-mode :mode ("\\.yml$" . yaml-mode))
-
-;;------------------------------------------------------------------------------
-;; JSON
-(use-package json-mode :mode ("\\.json$" . json-mode)
+;; JavaScript
+(use-package rjsx-mode :mode ("\\.jsx?$" . rjsx-mode)
   :config
-  (setq js-indent-level 2))
+  (setq js-indent-level 2)
+  (setq js-switch-indent-offset 2)
+  (setq js2-strict-trailing-comma-warning nil)
+  (add-to-list 'ac-modes 'rjsx-mode)
+  (add-hook 'rjsx-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))
+
+;;------------------------------------------------------------------------------
+;; CoffeeScript
+(use-package coffee-mode :mode ("\\.coffee$" . coffee-mode)
+  :config
+  (setq coffee-tab-width 2)
+  (add-to-list 'ac-modes 'coffee-mode)
+  (add-hook 'coffee-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))
 
 ;;------------------------------------------------------------------------------
 ;; Go
@@ -220,88 +241,22 @@
       (when indent
         (indent-line-to indent)
         (when (> offset 0) (forward-char offset)))))
-  (add-to-list 'ac-modes 'ruby-mode)
-  (add-hook 'ruby-mode-hook
-            '(lambda ()
-               ; (electric-pair-mode t)
-               (electric-indent-mode t)
-               (electric-layout-mode t)
-               ))
-  )
+  (add-to-list 'ac-modes 'ruby-mode))
 (use-package ruby-end :diminish ruby-end-mode)
-;; (use-package ruby-block :diminish ruby-block-mode
-;;   :config
-;;   (ruby-block-mode t)
-;;   (setq ruby-block-highlight-toggle t))
 
 ;;------------------------------------------------------------------------------
-;; JavaScript
-(use-package rjsx-mode :mode ("\\.jsx?$" . rjsx-mode)
+;; PHP
+(use-package php-mode :mode ("\\.php$" . php-mode)
   :config
-  (setq js-indent-level 2)
-  (setq js-switch-indent-offset 2)
-  (setq js2-strict-trailing-comma-warning nil)
-  (add-to-list 'ac-modes 'rjsx-mode)
-  (add-hook 'rjsx-mode-hook
+  (add-hook 'php-mode-hook
             '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
-               )))
-
-;;------------------------------------------------------------------------------
-;; CoffeeScript
-(use-package coffee-mode :mode ("\\.coffee$" . coffee-mode)
-  :config
-  (setq coffee-tab-width 2)
-  (add-to-list 'ac-modes 'coffee-mode)
-  (add-hook 'coffee-mode-hook
-            '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
-               )))
-
-;;------------------------------------------------------------------------------
-;; TypeScript
-(use-package typescript-mode :mode ("\\.ts$" . typescript-mode)
-  :config
-  (setq typescript-indent-level 2))
-
-(use-package web-mode :mode ("\\.tsx$" . web-mode)
-  :config
-  (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq web-mode-enable-auto-closing t)
-  (setq web-mode-enable-css-colorization t)
-  (custom-set-faces
-   '(web-mode-doctype-face ((t :inherit font-lock-constant-face)))
-   '(web-mode-html-tag-face ((t :inherit font-lock-keyword-face)))
-   '(web-mode-html-attr-name-face ((t :inherit font-lock-constant-face)))
-   ))
-
-;;------------------------------------------------------------------------------
-;; CSS/SCSS
-(use-package scss-mode :mode ("\\.s?css$" . scss-mode)
-  :config
-  (setq css-indent-offset 2)
-  (setq scss-compile-at-save nil)
-  (add-to-list 'ac-modes 'scss-mode)
-  (add-hook 'scss-mode-hook
-            '(lambda ()
-               (setq comment-start "// ")
-               (setq comment-end "")
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               (php-enable-drupal-coding-style)
                ))
-  (add-hook 'scss-mode-hook 'rainbow-mode))
+  (add-hook 'php-mode-hook 'rainbow-mode))
 
 ;;------------------------------------------------------------------------------
-;; Stylus
-(use-package stylus-mode :mode ("\\.styl$" . stylus-mode)
-  :config
-  (add-to-list 'ac-modes 'stylus-mode)
-  (add-hook 'stylus-mode-hook
-            '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
-               ))
-  (add-hook 'stylus-mode-hook 'rainbow-mode))
+;; Processing
+(use-package processing-mode :mode ("\\.pde$" . processing-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Web (HTML)
@@ -333,15 +288,41 @@
 (use-package jade-mode :mode (("\\.pug$" . jade-mode) ("\\.jade$" . jade-mode)))
 
 ;;------------------------------------------------------------------------------
-;; PHP
-(use-package php-mode :mode ("\\.php$" . php-mode)
+;; CSS/SCSS
+(use-package scss-mode :mode ("\\.s?css$" . scss-mode)
   :config
-  (add-hook 'php-mode-hook
+  (setq css-indent-offset 2)
+  (setq scss-compile-at-save nil)
+  (add-to-list 'ac-modes 'scss-mode)
+  (add-hook 'scss-mode-hook
             '(lambda ()
-               (php-enable-drupal-coding-style)
+               (setq comment-start "// ")
+               (setq comment-end "")
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
                ))
-  (add-hook 'php-mode-hook 'rainbow-mode))
+  (add-hook 'scss-mode-hook 'rainbow-mode))
 
 ;;------------------------------------------------------------------------------
-;; Processing
-(use-package processing-mode :mode ("\\.pde$" . processing-mode))
+;; Stylus
+(use-package stylus-mode :mode ("\\.styl$" . stylus-mode)
+  :config
+  (add-to-list 'ac-modes 'stylus-mode)
+  (add-hook 'stylus-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               ))
+  (add-hook 'stylus-mode-hook 'rainbow-mode))
+
+;;------------------------------------------------------------------------------
+;; JSON
+(use-package json-mode :mode ("\\.json$" . json-mode)
+  :config
+  (setq js-indent-level 2))
+
+;;------------------------------------------------------------------------------
+;; YAML
+(use-package yaml-mode :mode ("\\.yml$" . yaml-mode))
+
+;;------------------------------------------------------------------------------
+;; Markdown
+(use-package markdown-mode :mode ("\\.md$" . gfm-mode))
