@@ -15,6 +15,7 @@
 ## node
 /npm-debug.log
 /node_modules
+/yarn-error.log
 
 ## ruby
 /.bundle
