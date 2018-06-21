@@ -229,10 +229,10 @@
                ))
   )
 (use-package ruby-end :diminish ruby-end-mode)
-(use-package ruby-block :diminish ruby-block-mode
-  :config
-  (ruby-block-mode t)
-  (setq ruby-block-highlight-toggle t))
+;; (use-package ruby-block :diminish ruby-block-mode
+;;   :config
+;;   (ruby-block-mode t)
+;;   (setq ruby-block-highlight-toggle t))
 
 ;;------------------------------------------------------------------------------
 ;; JavaScript
