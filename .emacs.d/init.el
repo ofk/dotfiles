@@ -183,6 +183,18 @@
 (add-to-list 'auto-mode-alist '("config\\(\\.[a-zA-Z0-9_]+\\)*$" . conf-mode))
 
 ;;------------------------------------------------------------------------------
+;; Diff
+(add-hook 'diff-mode-hook
+          '(lambda ()
+             (set-face-attribute 'diff-added nil
+                                 :foreground "white" :background "dark green")
+             (set-face-attribute 'diff-removed nil
+                                 :foreground "white" :background "dark red")
+             (set-face-attribute 'diff-changed nil
+                                 :foreground "white" :background "purple red")
+             ))
+
+;;------------------------------------------------------------------------------
 ;; JavaScript
 (use-package rjsx-mode :mode ("\\.jsx?$" . rjsx-mode)
   :config
