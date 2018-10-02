@@ -208,6 +208,17 @@
                )))
 
 ;;------------------------------------------------------------------------------
+;; TypeScript
+(use-package typescript-mode :mode ("\\.ts$" . typescript-mode)
+  :config
+  (setq typescript-indent-level 2)
+  (add-to-list 'ac-modes 'typescript-mode)
+  (add-hook 'typescript-mode-hook
+            '(lambda ()
+               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               )))
+
+;;------------------------------------------------------------------------------
 ;; CoffeeScript
 (use-package coffee-mode :mode ("\\.coffee$" . coffee-mode)
   :config

@@ -17,6 +17,9 @@
 /node_modules
 /yarn-error.log
 
+## typescript
+/.rpt2_cache
+
 ## ruby
 /.bundle
 /vendor/bundle
