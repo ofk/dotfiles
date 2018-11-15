@@ -209,7 +209,7 @@
 
 ;;------------------------------------------------------------------------------
 ;; TypeScript
-(use-package typescript-mode :mode ("\\.ts$" . typescript-mode)
+(use-package typescript-mode :mode ("\\.tsx?$" . typescript-mode)
   :config
   (setq typescript-indent-level 2)
   (add-to-list 'ac-modes 'typescript-mode)
