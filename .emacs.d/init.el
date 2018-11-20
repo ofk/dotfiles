@@ -250,6 +250,7 @@
          ("Rakefile$" . ruby-mode))
   :config
   (setq ruby-deep-indent-paren-style nil)
+  (setq ruby-insert-encoding-magic-comment nil)
   (defadvice ruby-indent-line (after unindent-closing-paren activate)
     (let ((column (current-column))
           indent offset)
