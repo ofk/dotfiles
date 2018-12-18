@@ -16,7 +16,7 @@ fi
 if type sed >/dev/null 2>&1; then
     if type git >/dev/null 2>&1; then
         function gsed {
-            sed -i '' "s/${1}/${2}/g" $(git grep -l ${1})
+            sed -i '' "s/${1}/${2}/g" $(git grep -l "${1}")
         }
     fi
 fi
