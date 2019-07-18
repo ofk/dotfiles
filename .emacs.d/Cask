@@ -1,14 +1,15 @@
 (source gnu)
 (source melpa)
+(source org)
 
 (depends-on "use-package")
 
 (depends-on "auto-complete")
-(depends-on "undo-tree")
+(depends-on "undo-tree" :git "https://github.com/martijnvermaat/undo-tree.git")
 (depends-on "smartparens")
 (depends-on "smart-newline")
 (depends-on "anzu")
-(depends-on "rainbow-mode")
+(depends-on "rainbow-mode" :git "https://github.com/emacsmirror/rainbow-mode.git")
 
 (depends-on "rjsx-mode")
 (depends-on "typescript-mode")
