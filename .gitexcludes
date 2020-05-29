@@ -14,7 +14,6 @@
 
 ## node
 /npm-debug.log
-/node_modules
 /yarn-error.log
 
 ## typescript
@@ -22,9 +21,7 @@
 
 ## ruby
 /.bundle
-/vendor/bundle
 
 ## python
-/.python-version
 __pycache__/
 *.egg-info/
