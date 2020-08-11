@@ -21,7 +21,11 @@
 
 ## ruby
 /.bundle
+/vendor/bundle
 
 ## python
 __pycache__/
 *.egg-info/
+
+/.python-version
+/.vscode
