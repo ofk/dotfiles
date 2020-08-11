@@ -10,6 +10,13 @@ if type brew >/dev/null 2>&1; then
     require_script \
         "${BREW_DIR}/etc/bash_completion" \
         "${BREW_DIR}/opt/git/etc/bash_completion.d/git-completion.bash"
+
+    ## go
+    if type go >/dev/null 2>&1; then
+        export GOPATH="${HOME}/go"
+        export GOROOT="$(brew --prefix golang)/libexec"
+        add_path "${GOPATH}/bin"
+    fi
 fi
 
 ## sed
