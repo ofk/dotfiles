@@ -2,23 +2,18 @@
 ;; Initilaize
 
 ;;------------------------------------------------------------------------------
-;; cl
-
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+;; package + use-package
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (package-initialize)
 
-(require 'cl-lib)
-(eval-when-compile (require 'cl))
+(unless package-archive-contents
+  (package-refresh-contents))
 
-;;------------------------------------------------------------------------------
-;; Packages
-(when (or (require 'cask nil t)
-          (require 'cask "~/.cask/cask.el" t))
-  (defconst my-bundle (cask-initialize)))
+(when (not (package-installed-p 'use-package))
+  (package-install 'use-package))
 (require 'use-package)
+(setq use-package-always-ensure t)
 
 ;;------------------------------------------------------------------------------
 ;; Encoding
@@ -54,9 +49,6 @@
 ;; show file path in title bar
 (setq frame-title-format "%f")
 
-;; show buffer list in mini buffer (C-x b)
-(iswitchb-mode 1)
-
 ;; font-lock
 (global-font-lock-mode 1)
 (setq font-lock-support-mode 'jit-lock-mode)
@@ -75,7 +67,7 @@
 (setq read-file-name-completion-ignore-case t)
 
 ;;------------------------------------------------------------------------------
-;; Indent
+;; Input
 ;; tab-width
 (setq-default tab-width 4)
 
@@ -98,14 +90,13 @@
 ;; use #.fname.txt#
 (setq auto-save-default t)
 
+;; Auto revert file
+(global-auto-revert-mode t)
+
 ;;------------------------------------------------------------------------------
 ;; After save hook
 ;; add executable if script on save
 (add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
-
-;;------------------------------------------------------------------------------
-;; Auto revert file
-(global-auto-revert-mode t)
 
 ;;------------------------------------------------------------------------------
 ;; Custom file
@@ -116,54 +107,53 @@
 
 ;;------------------------------------------------------------------------------
 ;; auto-complete.el
-(use-package auto-complete :ensure t :diminish auto-complete-mode
+(use-package auto-complete :diminish auto-complete-mode
   :config
-  (add-to-list 'ac-dictionary-directories (concat (cask-dependency-path my-bundle 'auto-complete) "/dict"))
+  (add-to-list 'ac-dictionary-directories (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict"))
   (require 'auto-complete-config)
   (ac-config-default)
   (global-auto-complete-mode t))
 
 ;;------------------------------------------------------------------------------
 ;; undo-tree.el
-(use-package undo-tree :ensure t :diminish undo-tree-mode
+(use-package undo-tree :diminish undo-tree-mode
   :config
   (global-undo-tree-mode)
   (global-set-key (kbd "C-M-_") 'undo-tree-redo))
 
 ;;------------------------------------------------------------------------------
 ;; smartparens.el
-(use-package smartparens :ensure t :diminish smartparens-mode
+(use-package smartparens :diminish smartparens-mode
   :config
   (smartparens-global-mode t)
   (setq sp-highlight-pair-overlay nil))
 
 ;;------------------------------------------------------------------------------
 ;; smart-newline.el
-(use-package smart-newline :ensure t :diminish smart-newline-mode)
+(use-package smart-newline :diminish smart-newline-mode)
 
 ;;------------------------------------------------------------------------------
 ;; anzu.el
-(use-package anzu :ensure t :diminish anzu-mode
+(use-package anzu :diminish anzu-mode
   :config
   (global-anzu-mode 1)
   (setq anzu-deactivate-region t)
   (setq anzu-search-threshold 999))
 
 ;;------------------------------------------------------------------------------
-;; Rainbow mode
-(use-package rainbow-mode :defer t ;:diminish rainbow-mode
+;; visual-regexp-steroids.el
+(use-package pcre2el)
+(use-package visual-regexp-steroids
   :config
-  (add-to-list 'rainbow-html-colors-major-mode-list 'scss-mode)
-  (add-to-list 'rainbow-html-colors-major-mode-list 'stylus-mode)
-  (add-to-list 'rainbow-html-colors-major-mode-list 'php-mode))
+  (setq vr/engine 'pcre2el)
+  (global-set-key (kbd "M-%") 'vr/query-replace)
+  (global-set-key (kbd "C-c m") 'vr/mc-mark)
+  (global-set-key (kbd "C-M-r") 'vr/isearch-backward)
+  (global-set-key (kbd "C-M-s") 'vr/isearch-forward))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Majar mode
-
-;;------------------------------------------------------------------------------
-;; Lisp
-(add-to-list 'auto-mode-alist '("Cask$" . lisp-mode))
 
 ;;------------------------------------------------------------------------------
 ;; C/C++
@@ -177,10 +167,6 @@
 ;;------------------------------------------------------------------------------
 ;; Shell
 (add-to-list 'auto-mode-alist '("bashrc\\(\\.[a-zA-Z0-9_]+\\)*$" . sh-mode))
-
-;;------------------------------------------------------------------------------
-;; Conf
-(add-to-list 'auto-mode-alist '("config\\(\\.[a-zA-Z0-9_]+\\)*$" . conf-mode))
 
 ;;------------------------------------------------------------------------------
 ;; Diff
@@ -204,7 +190,7 @@
   (add-to-list 'ac-modes 'rjsx-mode)
   (add-hook 'rjsx-mode-hook
             '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               (add-to-list 'ac-dictionary-files (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict/js-mode"))
                )))
 
 ;;------------------------------------------------------------------------------
@@ -215,7 +201,7 @@
   (add-to-list 'ac-modes 'typescript-mode)
   (add-hook 'typescript-mode-hook
             '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               (add-to-list 'ac-dictionary-files (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict/js-mode"))
                )))
 
 ;;------------------------------------------------------------------------------
@@ -226,7 +212,7 @@
   (add-to-list 'ac-modes 'coffee-mode)
   (add-hook 'coffee-mode-hook
             '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/js-mode"))
+               (add-to-list 'ac-dictionary-files (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict/js-mode"))
                )))
 
 ;;------------------------------------------------------------------------------
@@ -279,10 +265,6 @@
   (add-hook 'php-mode-hook 'rainbow-mode))
 
 ;;------------------------------------------------------------------------------
-;; Processing
-(use-package processing-mode :mode ("\\.pde$" . processing-mode))
-
-;;------------------------------------------------------------------------------
 ;; Web (HTML)
 (use-package web-mode :mode ("\\.[sx]?html?\\(\\.[a-zA-Z_]+\\)?\\'" . web-mode)
   :config
@@ -301,7 +283,7 @@
                (setq emmet-preview-default nil) ;don't show preview when expand code
                (emmet-mode)
                )))
-(use-package emmet-mode :ensure t :diminish emmet-mode)
+(use-package emmet-mode :diminish emmet-mode)
 
 ;;------------------------------------------------------------------------------
 ;; Haml
@@ -322,7 +304,7 @@
             '(lambda ()
                (setq comment-start "// ")
                (setq comment-end "")
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               (add-to-list 'ac-dictionary-files (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict/css-mode"))
                ))
   (add-hook 'scss-mode-hook 'rainbow-mode))
 
@@ -333,7 +315,7 @@
   (add-to-list 'ac-modes 'stylus-mode)
   (add-hook 'stylus-mode-hook
             '(lambda ()
-               (add-to-list 'ac-dictionary-files (concat (cask-dependency-path my-bundle 'auto-complete) "/dict/css-mode"))
+               (add-to-list 'ac-dictionary-files (concat (package-desc-dir (cadr (assq 'auto-complete package-alist))) "/dict/css-mode"))
                ))
   (add-hook 'stylus-mode-hook 'rainbow-mode))
 
@@ -350,3 +332,15 @@
 ;;------------------------------------------------------------------------------
 ;; Markdown
 (use-package markdown-mode :mode ("\\.md$" . gfm-mode))
+
+;;------------------------------------------------------------------------------
+;; Dockerfile
+(use-package dockerfile-mode :mode ("Dockerfile\\(\\.[a-zA-Z0-9_]+\\)*$" . dockerfile-mode))
+
+;;------------------------------------------------------------------------------
+;; ssh-config
+(use-package ssh-config-mode
+  :mode ((".ssh/config$"  . ssh-config-mode)
+         ("sshd?_config$" . ssh-config-mode)
+         ("sshd?-config$" . ssh-config-mode))
+  )
