@@ -1,6 +1,4 @@
-# .dotfiles
-
-## About
+# dotfiles
 
 There are my configuration files.
 
@@ -13,30 +11,14 @@ $ ~/.dotfiles/setup
 
 ### Prepare on Linux
 
-1. Install git, emacs and recently bash
+1. Install git
 
-   `sudo apt install -y git emacs bash bash-completion`
-
-1. Install [Cask](https://github.com/cask/cask)
+   `sudo apt install -y git`
 
 ### Prepare on Mac
 
-1. Install Command Line Tools for Xcode
-
-   `xcode-select --install`
-
 1. Install [Homebrew](http://brew.sh/)
 
-1. Install git, emacs and recently bash
+1. Install git
 
-   `brew install git emacs cask bash bash-completion`
-
-1. Install other applications
-
-   `brew install nodebrew pyenv pyenv-virtualenv rbenv ruby-build`
-
-   `nodebrew install-binary lts-version && nodebrew use lts-version && npm update -g npm`
-
-   `brew install yarn --ignore-dependencies`
-
-   `brew cask install alfred cmd-eikana docker keepingyouawake safari-technology-preview google-chrome google-chrome-canary firefox firefox-developer-edition`
+   `brew install git`

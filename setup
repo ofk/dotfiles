@@ -1,46 +1,93 @@
 #!/bin/bash
-MODE=${1:-default}
 
-function copy_config {
-    echo "Create symbolic link files"
-    cd $(dirname $0)
+set -Ceu
 
-    for filename in .?*; do
-        case $filename in
-            '..' | '.git' | '.DS_Store')
-                continue;;
-            *.example)
-                echo "${PWD}/${filename} -> ${HOME}/${filename%.*}"
-                cp -i "${PWD}/${filename}" "${HOME}/${filename%.*}"
-                continue;;
-            *)
-                echo "${PWD}/${filename} -> ${HOME}/${filename}"
-                rm -rf "${HOME}/${filename}"
-                ln -Fis "${PWD}/${filename}" $HOME
-                ;;
-        esac
-    done
+usage() {
+	echo "Usage: $0 [MODE]" 1>&2
+	exit 1
 }
 
-function setup_default {
-    copy_config
-    echo ""
+copy_config() {
+	echo "Create symbolic link files"
+	cd $(dirname $0)
 
-    source "${HOME}/.bashrc"
-
-    echo "Run cask"
-    cd "${HOME}/.emacs.d"
-    cask
+	for filename in .?*; do
+		case $filename in
+		'..' | '.git' | '.DS_Store')
+			continue
+			;;
+		*.example)
+			echo "${PWD}/${filename} -> ${HOME}/${filename%.*}"
+			cp -i "${PWD}/${filename}" "${HOME}/${filename%.*}"
+			continue
+			;;
+		*)
+			echo "${PWD}/${filename} -> ${HOME}/${filename}"
+			rm -rf "${HOME}/${filename}"
+			ln -Fis "${PWD}/${filename}" $HOME
+			;;
+		esac
+	done
 }
 
-case $MODE in
-    config)
-        copy_config
-        ;;
-    default)
-        setup_default
-        ;;
-    *)
-        echo "'${MODE}' is not support mode"
-        ;;
-esac
+install_deps() {
+	if ! type brew >/dev/null 2>&1; then
+		echo "brew not found"
+		exit 1
+	fi
+
+	echo "Install dependencies"
+	cd $(dirname $0)
+	brew bundle
+}
+
+install_envs() {
+	if ! type anyenv >/dev/null 2>&1; then
+		echo "anyenv not found"
+		exit 1
+	fi
+
+	echo "Install programing envs"
+	anyenv install nodenv
+	anyenv install rbenv
+	anyenv install pyenv
+	git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+}
+
+main() {
+	while getopts h OPT; do
+		case $OPT in
+		h)
+			usage
+			;;
+		esac
+	done
+
+	shift $((OPTIND - 1))
+
+	local MODE=${1:-default}
+
+	case $MODE in
+	config)
+		copy_config
+		;;
+	deps)
+		install_deps
+		;;
+	envs)
+		install_envs
+		;;
+	default)
+		install_deps
+		copy_config
+		source "${HOME}/.bashrc"
+		install_envs
+		;;
+	*)
+		echo "'${MODE}' is not a supported mode" 1>&2
+		usage
+		;;
+	esac
+}
+
+main "$@"
