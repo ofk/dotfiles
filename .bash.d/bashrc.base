@@ -30,38 +30,40 @@ PS_USER="\[${COLOR_RED}\]\u\[${COLOR_DEFAULT}\]"
 PS_WORK="\[${COLOR_WHITE}\]\W\[${COLOR_DEFAULT}\]"
 
 if [ -n "${REMOTEHOST}${SSH_CONNECTION}" ]; then
-    PS_HOST=" \[${COLOR_CYAN}\]\h\[${COLOR_DEFAULT}\]"
+	PS_HOST=" \[${COLOR_CYAN}\]\h\[${COLOR_DEFAULT}\]"
 else
-    PS_HOST=''
+	PS_HOST=''
 fi
 
 if type __git_ps1 >/dev/null 2>&1; then
-    function ps_git__ {
-        local original_exit="$?"
-        local git_ps=$(__git_ps1 "(%s)" 2>/dev/null)
-        if [ -n "${git_ps}" ]; then
-            local gst=$(git status 2>/dev/null)
-            local git_ps_color=$COLOR_GREEN
-            if echo "$gst" | grep "^Changes not staged for commit:" >/dev/null 2>&1; then # git 1.9
-                git_ps_color=$COLOR_BOLD_RED
-            elif echo "$gst" | grep "^Changes to be committed:" >/dev/null 2>&1; then
-                git_ps_color=$COLOR_RED
-            elif echo "$gst" | grep "^Untracked files:" >/dev/null 2>&1; then
-                git_ps_color=$COLOR_YELLOW
-            elif echo "$gst" | grep "^# Changed but not updated:" >/dev/null 2>&1; then # git 1.7
-                git_ps_color=$COLOR_BOLD_RED
-            elif echo "$gst" | grep "^# Changes to be committed:" >/dev/null 2>&1; then
-                git_ps_color=$COLOR_RED
-            elif echo "$gst" | grep "^# Untracked files:" >/dev/null 2>&1; then
-                git_ps_color=$COLOR_YELLOW
-            fi
-            echo " ${git_ps_color}${git_ps}${COLOR_DEFAULT}"
-        fi
-        exit "${original_exit}"
-    }
-    PS_GIT="\$(ps_git__ 2>/dev/null)"
+	function ps_git__ {
+		local original_exit="$?"
+		local git_ps=$(__git_ps1 "(%s)" 2>/dev/null)
+
+		if [ -n "${git_ps}" ]; then
+			local gst=$(git status 2>/dev/null)
+			local git_ps_color=$COLOR_GREEN
+			if echo "$gst" | grep "^Changes not staged for commit:" >/dev/null 2>&1; then # git 1.9
+				git_ps_color=$COLOR_BOLD_RED
+			elif echo "$gst" | grep "^Changes to be committed:" >/dev/null 2>&1; then
+				git_ps_color=$COLOR_RED
+			elif echo "$gst" | grep "^Untracked files:" >/dev/null 2>&1; then
+				git_ps_color=$COLOR_YELLOW
+			elif echo "$gst" | grep "^# Changed but not updated:" >/dev/null 2>&1; then # git 1.7
+				git_ps_color=$COLOR_BOLD_RED
+			elif echo "$gst" | grep "^# Changes to be committed:" >/dev/null 2>&1; then
+				git_ps_color=$COLOR_RED
+			elif echo "$gst" | grep "^# Untracked files:" >/dev/null 2>&1; then
+				git_ps_color=$COLOR_YELLOW
+			fi
+			echo " ${git_ps_color}${git_ps}${COLOR_DEFAULT}"
+		fi
+
+		exit "${original_exit}"
+	}
+	PS_GIT="\$(ps_git__ 2>/dev/null)"
 else
-    PS_GIT=''
+	PS_GIT=''
 fi
 
 export PS1="[${PS_USER}${PS_HOST}:${PS_WORK}${PS_GIT}]$ "
@@ -72,11 +74,11 @@ export HISTFILESIZE=50000
 export HISTCONTROL=ignoreboth
 export HISTIGNORE="?:??:???:exit"
 
-## Common aliases
+## Common aliases and options
 if type dircolors >/dev/null 2>&1; then
-    LS_OPTIONS='--show-control-chars --color=auto -F -v'
+	LS_OPTIONS='--show-control-chars --color=auto -F -v'
 else
-    LS_OPTIONS='-FGw'
+	LS_OPTIONS='-FGw'
 fi
 
 alias ls="ls ${LS_OPTIONS}"

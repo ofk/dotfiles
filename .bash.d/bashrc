@@ -1,24 +1,22 @@
-require_script() {
-    for filepath in ${@}
-    do
-        if [ -f $filepath ]; then
-            . $filepath
-        fi
-    done
+function require_script() {
+	for filepath in ${@}; do
+		if [ -r $filepath ]; then
+			. $filepath
+		fi
+	done
 }
 
-add_path() {
-    for filepath in ${@}
-    do
-        PATH="${filepath}:${PATH}"
-    done
-    export PATH
+function add_path() {
+	for filepath in ${@}; do
+		PATH="${filepath}:${PATH}"
+	done
+	export PATH
 }
 
 BASH_DIR="${HOME}/.bash.d"
 
 require_script \
-    "${BASH_DIR}/bashrc.`uname`" \
-    "${BASH_DIR}/bashrc.base" \
-    "${BASH_DIR}/bashrc.env" \
-    "${HOME}/.bashrc.local"
+	"${BASH_DIR}/bashrc.$(uname)" \
+	"${BASH_DIR}/bashrc.base" \
+	"${BASH_DIR}/bashrc.env" \
+	"${HOME}/.bashrc.local"
