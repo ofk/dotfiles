@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -eu
+
+add_deps() {
+	if [ -f yarn.lock ]; then
+		yarn add "$@"
+	else
+		npm install "$@"
+	fi
+}
+
+remove_deps() {
+	if [ -f yarn.lock ]; then
+		yarn remove "$@"
+	else
+		npm uninstall "$@"
+	fi
+}
+
+echo_exact_option() {
+	if [ $# -gt 1 ]; then
+		local ver=$(jq -r ".$1[$(echo $2 | jq -R .)]" package.json)
+		if [ "${ver:0:1}" != "^" ]; then
+			echo -n "-"
+			echo "E"
+		fi
+	fi
+}
+
+main() {
+	local dep_names=$(jq -r '.dependencies | to_entries | map(select(.value | test("^[\\w+]+:") | not)) | .[].key' package.json)
+	local dev_dep_names=$(jq -r '.devDependencies | to_entries | map(select(.value | test("^[\\w+]+:") | not)) | .[].key' package.json)
+	local peer_deps=$(jq -r '.peerDependencies' package.json)
+
+	local dep_exact=$(echo_exact_option "dependencies" $dep_names)
+	local dev_dep_exact=$(echo_exact_option "devDependencies" $dev_dep_names)
+
+	if [ -n "$dep_names" ]; then
+		remove_deps $dep_names
+	fi
+
+	if [ -n "$dev_dep_names" ]; then
+		remove_deps $dev_dep_names
+	fi
+
+	if [ -n "$dev_dep_names" ]; then
+		add_deps -D $dev_dep_exact $dev_dep_names
+	fi
+
+	if [ -n "$dep_names" ]; then
+		add_deps $dep_exact $dep_names
+	fi
+
+	if [ "$peer_deps" != "null" ]; then
+		echo $peer_deps | jq -r '{ "peerDependencies": . }' >tmp-peer-package.json
+		jq -s '.[0] * .[1]' package.json tmp-peer-package.json >tmp-package.json
+		mv tmp-package.json package.json
+		rm -f tmp-peer-package.json
+	fi
+
+}
+
+main "$@"

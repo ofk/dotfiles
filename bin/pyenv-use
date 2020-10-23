@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -eu
+
+DEFAULT_PYTHON_VERSION=$(pyenv install -l | grep -v [-b] | grep "^  3.7" | tail -1 | xargs echo)
+
+usage() {
+	echo "Usage: $0 [-v $DEFAULT_PYTHON_VERSION] [$(basename $PWD)]" 1>&2
+	exit 1
+}
+
+main() {
+	local pyver=$DEFAULT_PYTHON_VERSION
+	local vname=$(basename $PWD)
+
+	while getopts v:h OPT; do
+		case $OPT in
+		v)
+			pyver=$OPTARG
+			;;
+		h)
+			usage
+			;;
+		esac
+	done
+
+	shift $((OPTIND - 1))
+
+	if [ $# -gt 0 ]; then
+		if [ -n "$1" ]; then
+			local vname=$1
+		fi
+	fi
+
+	if [ -z $(pyenv versions --bare --skip-aliases | grep "^${pyver}$") ]; then
+		pyenv install $pyver
+	fi
+
+	if [ -z $(pyenv versions --bare | grep "^${pyver}/envs/${vname}$") ]; then
+		pyenv virtualenv $pyver $vname
+	fi
+
+	pyenv local $vname
+}
+
+main "$@"
