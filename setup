@@ -2,6 +2,8 @@
 
 set -Ceu
 
+BASH_PATH=/usr/local/bin/bash
+
 usage() {
 	echo "Usage: $0 [MODE]" 1>&2
 	exit 1
@@ -41,6 +43,17 @@ install_deps() {
 	brew bundle
 }
 
+setup_bash() {
+	if grep -q "$BASH_PATH" /etc/shells; then
+		echo "Added $BASH_PATH"
+	else
+		echo "Add $BASH_PATH"
+        sudo sh -c "echo \"$BASH_PATH\" >>/etc/shells"
+	fi
+
+	chsh -s "$BASH_PATH"
+}
+
 install_envs() {
 	if ! type anyenv >/dev/null 2>&1; then
 		echo "anyenv not found"
@@ -77,8 +90,14 @@ main() {
 	envs)
 		install_envs
 		;;
+	bash)
+		setup_bash
+		;;
 	default)
-		install_deps
+		if [ "$SHELL" != "$BASH_PATH" ]; then
+			echo "Not yet setup bash"
+			exit
+		fi
 		copy_config
 		source "${HOME}/.bashrc"
 		install_envs

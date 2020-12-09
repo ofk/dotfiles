@@ -6,6 +6,8 @@ There are my configuration files.
 
 ```bash
 $ git clone git@github.com:ofk/dotfiles.git ~/.dotfiles
+$ ~/.dotfiles/setup deps
+$ ~/.dotfiles/setup bash
 $ ~/.dotfiles/setup
 ```
 
