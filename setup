@@ -48,7 +48,7 @@ setup_bash() {
 		echo "Added $BASH_PATH"
 	else
 		echo "Add $BASH_PATH"
-        sudo sh -c "echo \"$BASH_PATH\" >>/etc/shells"
+		sudo sh -c "echo \"$BASH_PATH\" >>/etc/shells"
 	fi
 
 	chsh -s "$BASH_PATH"
@@ -61,6 +61,8 @@ install_envs() {
 	fi
 
 	echo "Install programing envs"
+	anyenv install --init
+	eval "$(anyenv init -)"
 	anyenv install nodenv
 	anyenv install rbenv
 	anyenv install pyenv
@@ -99,8 +101,8 @@ main() {
 			exit
 		fi
 		copy_config
-		source "${HOME}/.bashrc"
 		install_envs
+		source "${HOME}/.bashrc"
 		;;
 	*)
 		echo "'${MODE}' is not a supported mode" 1>&2
