@@ -9,16 +9,20 @@ $ git clone git@github.com:ofk/dotfiles.git ~/.dotfiles
 $ ~/.dotfiles/setup
 ```
 
-### Prepare on Linux
+### Prepare
+
+1. [Generate SSH key](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh) and [add to your Github account](https://github.com/settings/keys)
+
+   `ssh-keygen -t rsa -b 4096 -C ofk@Machine-Name.local`
 
 1. Install git
 
-   `sudo apt install -y git`
+   * Use apt
 
-### Prepare on Mac
+      1. `sudo apt install -y git`
 
-1. Install [Homebrew](http://brew.sh/)
+   * Use Homebrew
 
-1. Install git
+      1. Install [Homebrew](http://brew.sh/)
 
-   `brew install git`
+      1. `brew install git`
