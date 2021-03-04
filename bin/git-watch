@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu
-
 if [ -z "${1}" ]; then
 	echo "usage: git watch <user>:<branch> [<local_branch>] OR git watch pull"
 	exit
