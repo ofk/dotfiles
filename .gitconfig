@@ -22,7 +22,7 @@
     lv = log --graph --abbrev-commit --date=short --decorate=short --pretty=format:'%C(yellow)%h %C(green)%cd %C(blue)%cn%C(red)%d %C(reset)%s'
     d = diff --indent-heuristic --ignore-space-change --histogram
 
-    sync = !git fetch -p && git pull $(git remote show | grep -e origin -e upstream | tail -n1) $(git rev-parse --abbrev-ref @) && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop)
+    sync = !git fetch -p && git pull $(git remote show | grep -e origin -e upstream | tail -n1) $(git rev-parse --abbrev-ref @) && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop) && git pull $(git remote show | grep -e origin -e upstream | tail -n1) --tags
     cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
     release = "!f(){ git commit -m \"Release $1\" && git tag -a $1 -m \"Release $1\";};f"
     init-commit = !git commit --allow-empty -m \"\\`mkdir $(basename $(pwd))\\`\"
