@@ -182,7 +182,9 @@
 
 ;;------------------------------------------------------------------------------
 ;; JavaScript
-(use-package rjsx-mode :mode ("\\.jsx?$" . rjsx-mode)
+(use-package rjsx-mode
+  :mode (("\\.jsx?$" . rjsx-mode)
+         ("\\.mjs$" . rjsx-mode))
   :config
   (setq js-indent-level 2)
   (setq js-switch-indent-offset 2)
