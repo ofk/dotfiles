@@ -23,6 +23,8 @@
     d = diff --indent-heuristic --ignore-space-change --histogram
 
     sync = !git fetch -p && git pull $(git remote show | grep -e origin -e upstream | tail -n1) $(git rev-parse --abbrev-ref @) && git branch -d $(git branch --merged | grep -v '*' | grep -v master | grep -v develop) && git pull $(git remote show | grep -e origin -e upstream | tail -n1) --tags
+    backup = "!f(){ local br=$(git rev-parse --abbrev-ref HEAD); git switch -c \"$br-bak\" && git switch -; };f"
+    recommit = "!f(){ git cherry-pick $1; local mes=$(git log -1 --pretty=format:\"%B\"); local fs=$(git diff --name-only HEAD~); git reset HEAD~ && git add $fs && git commit -m \"$mes\"; };f"
     cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
     release = "!f(){ git commit -m \"Release $1\" && git tag -a $1 -m \"Release $1\";};f"
     init-commit = !git commit --allow-empty -m \"\\`mkdir $(basename $(pwd))\\`\"
