@@ -119,7 +119,8 @@
 (use-package undo-tree :diminish undo-tree-mode
   :config
   (global-undo-tree-mode)
-  (global-set-key (kbd "C-M-_") 'undo-tree-redo))
+  (global-set-key (kbd "C-M-_") 'undo-tree-redo)
+  (setq undo-tree-auto-save-history nil))
 
 ;;------------------------------------------------------------------------------
 ;; smartparens.el
