@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/bin/zsh
 
 set -Ceu
-
-BASH_PATH=/usr/local/bin/bash
 
 usage() {
 	echo "Usage: $0 [MODE]" 1>&2
@@ -11,7 +9,7 @@ usage() {
 
 copy_config() {
 	echo "Create symbolic link files"
-	cd $(dirname $0)
+	cd $(dirname "$0")
 
 	for filename in .?*; do
 		case $filename in
@@ -26,7 +24,7 @@ copy_config() {
 		*)
 			echo "${PWD}/${filename} -> ${HOME}/${filename}"
 			rm -rf "${HOME}/${filename}"
-			ln -Fis "${PWD}/${filename}" $HOME
+			ln -Fis "${PWD}/${filename}" "$HOME"
 			;;
 		esac
 	done
@@ -34,44 +32,30 @@ copy_config() {
 
 install_deps() {
 	if ! type brew >/dev/null 2>&1; then
-		echo "brew not found"
+		echo "brew not found" 1>&2
 		exit 1
 	fi
 
 	echo "Install dependencies"
-	cd $(dirname $0)
+	cd $(dirname "$0")
 	brew bundle
 }
 
-setup_bash() {
-	if grep -q "$BASH_PATH" /etc/shells; then
-		echo "Added $BASH_PATH"
-	else
-		echo "Add $BASH_PATH"
-		sudo sh -c "echo \"$BASH_PATH\" >>/etc/shells"
-	fi
-
-	chsh -s "$BASH_PATH"
-}
-
-install_envs() {
-	if ! type anyenv >/dev/null 2>&1; then
-		echo "anyenv not found"
+install_runtimes() {
+	if ! type asdf >/dev/null 2>&1; then
+		echo "asdf not found" 1>&2
 		exit 1
 	fi
 
-	echo "Install programing envs"
-	anyenv install --init
-	eval "$(anyenv init -)"
-	anyenv install nodenv
-	anyenv install rbenv
-	anyenv install pyenv
-	git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+	echo "Install programing runtimes"
+	asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+	asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
+	asdf plugin-add python
 }
 
 main() {
-	while getopts h OPT; do
-		case $OPT in
+	while getopts h opt; do
+		case $opt in
 		h)
 			usage
 			;;
@@ -80,32 +64,26 @@ main() {
 
 	shift $((OPTIND - 1))
 
-	local MODE=${1:-default}
+	local mode=${1:-default}
 
-	case $MODE in
+	case $mode in
 	config)
 		copy_config
 		;;
 	deps)
 		install_deps
 		;;
-	envs)
-		install_envs
-		;;
-	bash)
-		setup_bash
+	runtimes)
+		install_runtimes
 		;;
 	default)
-		if [ "$SHELL" != "$BASH_PATH" ]; then
-			echo "Not yet setup bash"
-			exit
-		fi
 		copy_config
-		install_envs
-		source "${HOME}/.bashrc"
+		source "${HOME}/.zshrc"
+		install_runtimes
+		source "${HOME}/.zshrc"
 		;;
 	*)
-		echo "'${MODE}' is not a supported mode" 1>&2
+		echo "'${mode}' is not a supported mode" 1>&2
 		usage
 		;;
 	esac
