@@ -72,19 +72,6 @@ function setup_prompt {
 setup_prompt
 unset setup_prompt
 
-# completion
-autoload -Uz compinit
-compinit
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-zstyle ':completion:*' ignore-parents parent pwd ..
-zstyle ':completion:*:default' menu select=1
-zstyle ':completion:*:cd:*' ignore-parents parent pwd
-
-setopt complete_in_word
-
-# other
-REPORTTIME=3
-
 # homebrew
 if type brew &>/dev/null; then
 	function setup_brew {
@@ -103,6 +90,19 @@ if type brew &>/dev/null; then
 	setup_brew
 	unset setup_brew
 fi
+
+# completion
+autoload -Uz compinit
+compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*' ignore-parents parent pwd ..
+zstyle ':completion:*:default' menu select=1
+zstyle ':completion:*:cd:*' ignore-parents parent pwd
+
+setopt complete_in_word
+
+# other
+REPORTTIME=3
 
 # alias
 case ${OSTYPE} in
