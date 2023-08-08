@@ -1,0 +1,685 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'ruby-fire'
+require 'shellwords'
+require 'fileutils'
+require 'json'
+require 'yaml'
+
+# React module
+class Starters
+  def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true,
+                  example: true, bundler: 'parcel', dom: 'react', style: 'jsx')
+    raise "Not support bundler: #{bundler}" unless %w[none parcel].include?(bundler)
+    raise "Not support dom: #{dom}" unless %w[none react].include?(dom)
+    raise "Not support style: #{style}" unless %w[none jsx scss].include?(style)
+
+    @example = example
+    @bundler = bundler unless bundler == 'none'
+    @dom = dom unless dom == 'none'
+    @style = style unless style == 'none'
+
+    node(manager:, scope:, test:, pre_commit_hook:)
+
+    setup_mock_files
+    setup_microbundle if @dom != 'react'
+    setup_react if @dom == 'react'
+    setup_scss if @dom && @style == 'scss'
+    setup_stylelint_with_prettier if @dom && @style
+
+    if @bundler && @dom == 'react'
+      setup_bundler
+      setup_example
+    end
+
+    nil
+  end
+
+  private
+
+  def setup_mock_files
+    commit 'Add mock files' do
+      update_file 'src/index.ts' do
+        <<~EOS
+          export const noop = (): void => {};
+        EOS
+      end
+
+      if @test
+        update_file 'tests/index.test.ts' do
+          <<~EOS
+            import { noop } from '../src';
+            describe('index.ts', () => {
+              test('noop', () => {
+                expect(typeof noop).toBe('function');
+              });
+            });
+          EOS
+        end
+      end
+    end
+  end
+
+  def setup_microbundle
+    add_npm_deps %w[-D microbundle]
+
+    commit 'Add microbundle config' do
+      update_package_json do |pkg|
+        pkg.merge(
+          'type' => 'module',
+          'main' => "dist/#{pkg['name']}.cjs",
+          'scripts' => (pkg['scripts'] || {}).merge(
+            'build' => 'microbundle --tsconfig tsconfig.build.json'
+          ),
+          'browserslist' => ['since 2017-06'],
+          'source': 'src/index.ts'
+        )
+      end
+    end
+  end
+
+  def setup_react
+    deps = %w[react react-dom]
+    deps << '@emotion/css' if @style == 'jsx'
+    dev_deps = %w[@types/react @types/react-dom]
+
+    add_npm_deps ['-D', *deps, *dev_deps]
+
+    commit 'Add react and react-dom into peerDeps' do
+      update_package_json do |pkg|
+        pkg.merge(
+          'peerDependencies' => pkg['devDependencies'].filter { |k, _v| %w[react react-dom].include?(k) }
+        )
+      end
+    end
+  end
+
+  def setup_scss
+    add_npm_deps %w[-D postcss autoprefixer postcss-scss @csstools/postcss-sass]
+
+    commit 'Setup SCSS' do
+      update_file 'postcss.config.js' do
+        <<~EOS
+          module.exports = {
+            parser: 'postcss-scss',
+            map: {
+              sourcesContent: true,
+              annotation: true,
+            },
+            plugins: {
+              '@csstools/postcss-sass': {
+                includePaths: ['node_modules'],
+                outputStyle: 'compressed',
+              },
+              autoprefixer: {},
+            },
+          };
+        EOS
+      end
+    end
+  end
+
+  def setup_stylelint_with_prettier
+    dev_deps = %w[stylelint]
+    dev_deps.push(*%w[stylelint-scss]) if @style == 'scss'
+    dev_deps.push(*%w[postcss-syntax @stylelint/postcss-css-in-js]) if @style == 'jsx'
+    dev_deps << '@ofk/stylelint-config-recommend'
+    add_npm_deps ['-D', *dev_deps]
+
+    commit 'Add lint{,-fix}:stylelint command' do
+      case @style
+      when 'jsx'
+        update_json_file '.stylelintrc.json' do
+          {
+            'customSyntax' => '@stylelint/postcss-css-in-js',
+            'extends' => '@ofk/stylelint-config-recommend'
+          }
+        end
+        update_package_json do |pkg|
+          js_lint = (pkg['lint-staged'] || {}).delete('*.{js,jsx,ts,tsx}')
+          new_pkg = {
+            'scripts' => (pkg['scripts'] || {}).merge(
+              'lint-fix:stylelint' => "#{@runner} lint:stylelint -- --fix",
+              'lint:stylelint' => "stylelint --aei '**/*.{jsx,tsx}'"
+            ),
+            'lint-staged' => (pkg['lint-staged'] || {}).merge(
+              '*.{js,ts}' => js_lint,
+              '*.{jsx,tsx}' => [js_lint[0], 'stylelint --fix --aei', *js_lint[1..]]
+            )
+          }
+          new_pkg.delete('lint-staged') unless @pre_commit_hook
+          pkg.merge(new_pkg)
+        end
+      when 'scss'
+        update_json_file '.stylelintrc.json' do
+          {
+            'plugins' => ['stylelint-scss'],
+            'extends' => '@ofk/stylelint-config-recommend'
+          }
+        end
+        update_package_json do |pkg|
+          new_pkg = {
+            'scripts' => (pkg['scripts'] || {}).merge(
+              'lint-fix:stylelint' => "#{@runner} lint:stylelint -- --fix",
+              'lint:stylelint' => "stylelint --aei '**/*.{css,scss}'"
+            ),
+            'lint-staged' => (pkg['lint-staged'] || {}).merge(
+              '*.{css,scss}' => 'stylelint --fix --aei'
+            )
+          }
+          new_pkg.delete('lint-staged') unless @pre_commit_hook
+          pkg.merge(new_pkg)
+        end
+      end
+
+      copy_ignore_files stylelint: true
+    end
+  end
+
+  def setup_bundler
+    case @bundler
+    when 'parcel'
+      add_npm_deps %w[-D parcel]
+
+      commit 'Add a dev command' do
+        update_package_json do |pkg|
+          pkg.merge(
+            'scripts' => (pkg['scripts'] || {}).merge(
+              'dev' => "parcel serve --dist-dir .parcel-dist 'examples/index.html'"
+            )
+          )
+        end
+
+        update_ignore_file '.gitignore' do |paths|
+          paths += %w[.parcel-cache .parcel-dist]
+          paths
+        end
+
+        copy_ignore_files
+      end
+    end
+  end
+
+  def setup_example
+    commit 'Add examples' do
+      update_json_file 'examples/.eslintrc.json' do
+        {
+          'rules' => {
+            'import/no-extraneous-dependencies' => 'off'
+          }
+        }
+      end
+
+      update_file 'examples/index.html' do
+        <<~EOS
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="utf-8">
+              <title>#{File.basename(Dir.pwd) + (@example ? ' examples' : '')}</title>
+              #{@style == 'scss' ? '<link rel="stylesheet" href="renderer.scss">' : ''}
+            </head>
+            <body>
+              <div id="app"></div>
+              <script src="renderer.tsx" type="module"></script>
+            </body>
+          </html>
+        EOS
+      end
+
+      update_file 'examples/renderer.tsx' do
+        <<~EOS
+          import React from 'react';
+          import { createRoot } from 'react-dom/client';
+          import { App } from './components/App';
+
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          createRoot(document.querySelector('#app')!).render(
+            <React.StrictMode>
+              <App />
+            </React.StrictMode>
+          );
+        EOS
+      end
+
+      update_file 'examples/components/App.tsx' do
+        make_app_component('examples')
+      end
+
+      if @style == 'scss'
+        update_file 'examples/renderer.scss' do
+          <<~EOS
+            #app {
+              display: flex;
+              color: #333;
+            }
+          EOS
+        end
+      end
+
+      update_file 'tsconfig.json' do |text|
+        text.sub(/("include"):\s*\[(.*?)\]/, '\1:[\2,"examples/**/*"]')
+      end
+    end
+  end
+
+  def make_app_component(text)
+    if @style == 'jsx'
+      <<~EOS
+        import { css } from '@emotion/css';
+        import React from 'react';
+
+        export const App: React.FC = () => (
+          <div
+            className={css`
+              display: flex;
+              flex-direction: column;
+              color: #333;
+            `}
+          >
+            #{text}
+          </div>
+        );
+      EOS
+    else
+      <<~EOS
+        import React from 'react';
+        export const App: React.FC = () => (
+          <div>
+            #{text}
+          </div>
+        );
+      EOS
+    end
+  end
+end
+
+# Node
+class Starters
+  def node(manager: 'npm', scope: nil, test: true, pre_commit_hook: true)
+    raise "Not support manager: #{manager}" unless %w[npm yarn].include?(manager)
+
+    test_git!
+
+    @manager = manager
+    @runner = { 'npm' => 'npm run', 'yarn' => 'yarn' }[manager]
+    @scope = scope
+    @test = test
+    @pre_commit_hook = pre_commit_hook
+
+    setup_npm
+    setup_prettier
+    setup_husky_and_lint_stage if @pre_commit_hook
+    setup_typescript_with_prettier
+    setup_eslint_with_prettier
+    setup_jest if @test
+    setup_publish
+
+    nil
+  end
+
+  private
+
+  def setup_npm
+    command [@manager, 'init', '-y'], 'fix license' do
+      update_package_json do |pkg|
+        pkg.merge(
+          'name' => @scope ? "@#{@scope}/#{pkg['name'].downcase}" : pkg['name'].downcase,
+          'version' => '0.0.1',
+          'license' => 'UNLICENSED',
+          'private' => true
+        )
+      end
+    end
+
+    commit 'Add node_modules into .gitignore' do
+      update_ignore_file '.gitignore' do |paths|
+        paths + %w[node_modules]
+      end
+    end
+  end
+
+  def setup_prettier
+    add_npm_deps %w[-D npm-run-all prettier prettier-package-json]
+
+    commit 'Add lint{,-fix} command' do
+      update_json_file '.prettierrc.json' do
+        {
+          'printWidth' => 100,
+          'singleQuote' => true
+        }
+      end
+
+      update_package_json do |pkg|
+        pkg.merge(
+          'scripts' => (pkg['scripts'] || {}).merge(
+            {
+              'lint-fix' => 'run-s -c lint-fix:*',
+              'lint-fix:prettier' => 'prettier --write .',
+              'lint-fix:package-json' => 'prettier-package-json --write',
+              'lint' => 'run-s -c lint:*',
+              'lint:prettier' => 'prettier --check .',
+              'lint:package-json' => 'prettier-package-json -l'
+            }
+          )
+        )
+      end
+
+      copy_ignore_files prettier: true
+      `npm run lint-fix`
+    end
+  end
+
+  def setup_husky_and_lint_stage
+    add_npm_deps %w[-D husky lint-staged] do
+      `npm run lint-fix`
+    end
+
+    commit 'Add lint-staged config' do
+      update_package_json do |pkg|
+        pkg.merge(
+          'lint-staged' => {
+            'package.json' => 'prettier-package-json --write',
+            '*.{md,json,html}' => 'prettier --write'
+          }
+        )
+      end
+      `npm run lint-fix`
+    end
+
+    run_npm_dep %w[husky install] do
+      update_package_json do |pkg|
+        pkg.merge(
+          'scripts' => (pkg['scripts'] || {}).merge(
+            {
+              'prepare' => 'husky install'
+            }
+          )
+        )
+      end
+      `npm run lint-fix`
+    end
+
+    run_npm_dep ['husky', 'add', '.husky/pre-commit', '"npx lint-staged"']
+  end
+
+  def setup_typescript_with_prettier
+    add_npm_deps %w[-D typescript rimraf]
+
+    run_npm_dep %w[tsc --init --lib esnext,dom]
+
+    commit 'Setup typescript' do
+      update_tsconfig_json(
+        'jsx' => 'react',
+        'noEmit' => true,
+        'noImplicitAny' => true,
+        'strictNullChecks' => true,
+        'strictFunctionTypes' => true,
+        'strictBindCallApply' => true,
+        'strictPropertyInitialization' => true,
+        'noImplicitThis' => true,
+        'useUnknownInCatchVariables' => true,
+        'alwaysStrict' => true,
+        'noUnusedLocals' => true,
+        'noUnusedParameters' => true,
+        # 'exactOptionalPropertyTypes' => true,
+        'noImplicitReturns' => true,
+        'noFallthroughCasesInSwitch' => true,
+        'noUncheckedIndexedAccess' => true,
+        'noImplicitOverride' => true
+      ) do |text|
+        text.sub(/}\s*}\s*\z/, '},"include":["src/**/*"],"exclude":["node_modules"]}')
+      end
+
+      update_json_file 'tsconfig.build.json' do
+        {
+          'extends' => './tsconfig',
+          'compilerOptions' => {
+            'declaration' => true,
+            'outDir' => './dist',
+            'rootDir' => './src',
+            'noEmit' => false
+          },
+          'include' => ['src/**/*'],
+          'exclude' => ['node_modules', 'src/**/*.test.*']
+        }
+      end
+
+      update_package_json do |pkg|
+        pkg.merge(
+          'scripts' => (pkg['scripts'] || {}).merge(
+            {
+              'prebuild' => 'rimraf dist',
+              'build' => 'tsc -p tsconfig.build.json',
+              'lint:tsc' => 'tsc'
+            }
+          )
+        )
+      end
+
+      update_ignore_file '.gitignore' do |paths|
+        paths + %w[dist]
+      end
+
+      copy_ignore_files
+    end
+  end
+
+  def setup_eslint_with_prettier
+    add_npm_deps %w[-D eslint @ofk/eslint-config-recommend
+                    @typescript-eslint/eslint-plugin@^6.0.0
+                    @typescript-eslint/parser@^6.0.0]
+
+    commit 'Add lint{,-fix}:eslint command' do
+      update_eslintrc_json do
+        {
+          'root' => true,
+          'env' => {
+            'browser' => true,
+            'es6' => true
+          },
+          'extends' => '@ofk/eslint-config-recommend',
+          'parserOptions' => {
+            'project' => './tsconfig.json'
+          }
+        }
+      end
+
+      update_package_json do |pkg|
+        new_pkg = {
+          'scripts' => (pkg['scripts'] || {}).merge(
+            {
+              'lint-fix:eslint' => "#{@runner} lint:eslint -- --fix",
+              'lint:eslint' => 'eslint --ext .js,.jsx,.ts,.tsx .'
+            }
+          ),
+          'lint-staged' => (pkg['lint-staged'] || {}).merge(
+            {
+              '*.{js,jsx,ts,tsx}' => ['eslint --fix --ext .js,.jsx,.ts,.tsx', 'prettier --write']
+            }
+          )
+        }
+        new_pkg.delete('lint-staged') unless @pre_commit_hook
+        pkg.merge(new_pkg)
+      end
+
+      copy_ignore_files eslint: true
+    end
+  end
+
+  def setup_jest
+    add_npm_deps %w[-D jest @types/jest ts-jest]
+
+    run_cmd = @manager == 'yarn' ? 'yarn' : 'npx'
+    commit "`#{run_cmd} jest --init` and fix preset" do
+      jest_init_cmd = <<~EOS
+        expect -c "
+        set timeout 5
+        spawn #{run_cmd} jest --init
+        expect \\"\\\\"package.json\\\\"?\\"
+        send \\"y\\"
+        expect \\"configuration file?\\"
+        send \\"n\\"
+        expect \\"used for testing\\"
+        send \\"\\n\\"
+        expect \\"coverage reports?\\"
+        send \\"y\\"
+        expect \\"for coverage?\\"
+        send \\"\\n\\"
+        expect \\"every test?\\"
+        send \\"y\\"
+        expect \\"jest.config.ts\\"
+        exit 0
+        "
+      EOS
+      `#{jest_init_cmd}`
+      update_file 'jest.config.js' do |text|
+        text.sub %r{// preset: undefined}, "preset: 'ts-jest'"
+      end
+      update_file 'tsconfig.json' do |text|
+        text.sub(/("include"):\s*\[(.*?)\]/, '\1:[\2,"tests/**/*"]')
+      end
+      update_ignore_file '.gitignore' do |paths|
+        paths + %w[coverage]
+      end
+      copy_ignore_files
+    end
+  end
+
+  def setup_publish
+    commit 'Update package.json for publish' do
+      update_package_json do |pkg|
+        pkg.merge(
+          'main' => 'dist/index.js',
+          'files' => %w[dist src],
+          'scripts' => (pkg['scripts'] || {}).merge(
+            'prepublishOnly' => "#{@runner} build"
+          ),
+          'types' => 'dist/index.d.ts'
+        )
+      end
+    end
+  end
+end
+
+# JavaScript Base
+class Starters
+  private
+
+  def add_npm_deps(*deps_set)
+    manager_install = @manager == 'yarn' ? 'add' : 'i'
+    commands = deps_set.map { |deps| [@manager, manager_install, *deps].join(' ') }
+    command commands.join(' && ') do
+      update_package_json
+      yield if block_given?
+    end
+  end
+
+  def run_npm_dep(*commands)
+    command [@manager == 'yarn' ? 'yarn' : 'npx', *commands] do
+      yield if block_given?
+    end
+  end
+
+  def update_package_json(&block)
+    update_json_file('package.json', %w[
+                       name version private description keywords homepage bugs
+                       main files bin man directories repository
+                       author contributor license scripts config
+                       dependencies devDependencies peerDependencies
+                       bundledDependencies optionalDependencies
+                       engines engineStrict os cpu preferGlobal publishConfig
+                     ], &block)
+  end
+
+  def update_eslintrc_json(&block)
+    update_json_file('.eslintrc.json', %w[
+                       root parserOptions env extends plugins settings globals rules overrides
+                     ], &block)
+  end
+
+  def update_tsconfig_json(compiler_options)
+    update_file 'tsconfig.json' do |text|
+      compiler_options.each do |k, v|
+        ek = k.to_json
+        ev = v.to_json
+        text = text.sub %r{^\s*//\s*#{ek}:[^,]+}, "#{ek}: #{ev}"
+      end
+      block_given? ? yield(text) : text
+    end
+  end
+end
+
+# Base
+class Starters
+  def initialize(github_username: nil)
+    @github_username = github_username
+  end
+
+  private
+
+  def test_git!
+    return if File.directory?('.git')
+
+    puts 'Not found .git'
+    exit
+  end
+
+  def commit(message, &block)
+    instance_eval(&block)
+    `git add .`
+    `git commit -m #{Shellwords.escape(message)}`
+  end
+
+  def command(cmd, append_message = nil)
+    command = cmd.is_a?(Array) ? cmd.join(' ') : cmd.to_s
+    message = "`#{command}`"
+    message += " and #{append_message}" if append_message
+    commit message do
+      puts `#{command}`
+      yield if block_given?
+    end
+  end
+
+  def update_file(path)
+    text = File.exist?(path) ? File.read(path) : nil
+    text = yield text
+    FileUtils.mkdir_p(File.dirname(path))
+    File.write(path, text.strip + "\n")
+  end
+
+  def update_ignore_file(path)
+    update_file(path) do |text|
+      data = text ? text.strip.split("\n") : []
+      data = yield data if block_given?
+      data.sort.join("\n")
+    end
+  end
+
+  def copy_ignore_files(prettier: false, eslint: false, stylelint: false)
+    `#{prettier ? 'true' : '[ -f .prettierignore ]'} && cp .gitignore .prettierignore`
+    `#{eslint ? 'true' : '[ -f .eslintignore ]'} && cp .gitignore .eslintignore`
+    `#{stylelint ? 'true' : '[ -f .stylelintignore ]'} && cp .gitignore .stylelintignore`
+  end
+
+  def update_json_file(path, sort_keys = [])
+    update_file(path) do |text|
+      data = text ? JSON.parse(text) : {}
+      data = yield data if block_given?
+      data = sort_keys.map { |k| data[k] ? [k, nil] : nil }.compact.to_h.merge(data)
+      JSON.pretty_generate(data)
+    end
+  end
+
+  def update_yaml_file(path, sort_keys = [])
+    update_file(path) do |text|
+      data = text ? YAML.safe_load(text) : {}
+      data = yield data if block_given?
+      data = sort_keys.map { |k| data[k] ? [k, nil] : nil }.compact.to_h.merge(data)
+      YAML.dump(data).gsub(/^( [^\n]+\n)(?! )/m) { |m| "#{m}\n" }
+    end
+  end
+end
+
+Fire.fire(Starters) if __FILE__ == $PROGRAM_NAME
