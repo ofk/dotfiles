@@ -181,6 +181,18 @@ if type docker &>/dev/null; then
 		alias ffmpeg='docker run -it --rm -v $PWD:/mnt -w /mnt jrottenberg/ffmpeg'
 	fi
 
+	if ! type ffprobe >/dev/null 2>&1; then
+		alias ffprobe='docker run -it --rm --entrypoint=ffprobe -v $PWD:/mnt -w /mnt jrottenberg/ffmpeg'
+	fi
+
+	if ! type magick >/dev/null 2>&1; then
+		alias magick='docker run -it --rm --entrypoint=magick -v $PWD:/mnt -w /mnt dpokidov/imagemagick'
+	fi
+
+	if ! type composite >/dev/null 2>&1; then
+		alias composite='docker run -it --rm --entrypoint=composite -v $PWD:/mnt -w /mnt dpokidov/imagemagick'
+	fi
+
 	if ! type convert >/dev/null 2>&1; then
 		alias convert='docker run -it --rm -v $PWD:/mnt -w /mnt dpokidov/imagemagick'
 	fi
@@ -191,6 +203,10 @@ if type docker &>/dev/null; then
 
 	if ! type mogrify >/dev/null 2>&1; then
 		alias mogrify='docker run -it --rm --entrypoint=mogrify -v $PWD:/mnt -w /mnt dpokidov/imagemagick'
+	fi
+
+	if ! type montage >/dev/null 2>&1; then
+		alias montage='docker run -it --rm --entrypoint=montage -v $PWD:/mnt -w /mnt dpokidov/imagemagick'
 	fi
 fi
 
