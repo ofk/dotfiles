@@ -10,9 +10,9 @@ require 'yaml'
 # React module
 class Starters
   def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true,
-                  example: true, bundler: 'parcel', dom: 'react', style: 'jsx')
+                  example: true, bundler: 'none', dom: 'react', style: 'jsx')
     raise "Not support bundler: #{bundler}" unless %w[none parcel].include?(bundler)
-    raise "Not support dom: #{dom}" unless %w[none react].include?(dom)
+    raise "Not support dom: #{dom}" unless %w[none lib react].include?(dom)
     raise "Not support style: #{style}" unless %w[none jsx scss].include?(style)
 
     @example = example
@@ -23,13 +23,20 @@ class Starters
     node(manager:, scope:, test:, pre_commit_hook:)
 
     setup_mock_files
+    setup_jest_jsdom if @dom
     setup_microbundle if @dom != 'react'
     setup_react if @dom == 'react'
     setup_scss if @dom && @style == 'scss'
     setup_stylelint_with_prettier if @dom && @style
 
-    if @bundler && @dom == 'react'
-      setup_bundler
+    if @example
+      if @bundler
+        setup_bundler
+      else
+        @bundler = 'npx-parcel'
+        setup_bundler
+        @bundler = nil
+      end
       setup_example
     end
 
@@ -61,6 +68,16 @@ class Starters
     end
   end
 
+  def setup_jest_jsdom
+    add_npm_deps %w[-D jest-environment-jsdom]
+
+    commit 'Update jest config' do
+      update_file 'jest.config.js' do |text|
+        text.sub %r{// testEnvironment: ".*"}, "testEnvironment: 'jest-environment-jsdom'"
+      end
+    end
+  end
+
   def setup_microbundle
     add_npm_deps %w[-D microbundle]
 
@@ -76,6 +93,8 @@ class Starters
           'source': 'src/index.ts'
         )
       end
+
+      FileUtils.mv('jest.config.js', 'jest.config.cjs')
     end
   end
 
@@ -181,12 +200,16 @@ class Starters
     case @bundler
     when 'parcel'
       add_npm_deps %w[-D parcel]
+    end
 
+    case @bundler
+    when 'parcel', 'npx-parcel'
       commit 'Add a dev command' do
         update_package_json do |pkg|
+          cmd = @bundler == 'npx-parcel' ? 'npx parcel' : 'parcel'
           pkg.merge(
             'scripts' => (pkg['scripts'] || {}).merge(
-              'dev' => "parcel serve --dist-dir .parcel-dist 'examples/index.html'"
+              'dev' => "#{cmd} serve --dist-dir .parcel-dist 'examples/index.html'"
             )
           )
         end
@@ -202,6 +225,43 @@ class Starters
   end
 
   def setup_example
+    case @dom
+    when 'react'
+      setup_react_example
+    else
+      commit 'Add examples' do
+        update_file 'examples/index.html' do
+          <<~EOS
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <title>#{File.basename(Dir.pwd) + (@example ? ' examples' : '')}</title>
+              </head>
+              <body>
+                <div id="app"></div>
+                <script src="scripts.ts" type="module"></script>
+              </body>
+            </html>
+          EOS
+        end
+
+        update_file 'examples/scripts.ts' do
+          <<~EOS
+            import { noop } from '../src';
+
+            document.body.appendChild(document.createTextNode(noop));
+          EOS
+        end
+
+        update_file 'tsconfig.json' do |text|
+          text.sub(/("include"):\s*\[(.*?)\]/, '\1:[\2,"examples/**/*"]')
+        end
+      end
+    end
+  end
+
+  def setup_react_example
     commit 'Add examples' do
       update_json_file 'examples/.eslintrc.json' do
         {
