@@ -13,7 +13,7 @@ $ ~/.dotfiles/setup
 ### Prepare
 
 1. [Generate SSH key](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh) and [add to your Github account](https://github.com/settings/keys)
-   - `ssh-keygen -t rsa -b 4096 -C ofk@Machine-Name.local`
+   - `ssh-keygen -t ed25519 -C $(whoami)@$(hostname)`
 1. Install git
    - Use apt
      1. `sudo apt install -y git`
