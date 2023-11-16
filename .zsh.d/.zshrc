@@ -210,6 +210,20 @@ if type docker &>/dev/null; then
 	fi
 fi
 
+if type ffmpeg >/dev/null 2>&1; then
+	function ffmpeg-mp4 {
+		ffmpeg -i $1 -pix_fmt yuv420p ${1%.*}.mp4
+	}
+
+	function ffmpeg-gif {
+		local tmp_palette=.tmp-${1%.*}.png
+		ffmpeg -i $1 -vf "palettegen" -y $tmp_palette
+		ffmpeg -i $1 -i $tmp_palette -lavfi "fps=12,scale=900:-1:flags=lanczos [x]; [x][1:v] paletteuse=dither=bayer:bayer_scale=5:di\
+ff_mode=rectangle" -y ${1%.*}.gif
+		rm -f $tmp_palette
+	}
+fi
+
 if [ "$(uname)" = 'Darwin' ]; then
 	alias coteditor='open -a CotEditor'
 
