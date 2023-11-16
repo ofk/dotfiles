@@ -2,6 +2,8 @@
 
 set -Ceu
 
+SCRIPT_NAME=$0
+
 usage() {
 	echo "Usage: $0 [MODE]" 1>&2
 	exit 1
@@ -9,7 +11,7 @@ usage() {
 
 copy_config() {
 	echo "Create symbolic link files"
-	cd $(dirname "$0")
+	cd $(dirname "$SCRIPT_NAME")
 
 	for filename in .?*; do
 		case $filename in
@@ -37,7 +39,7 @@ install_deps() {
 	fi
 
 	echo "Install dependencies"
-	cd $(dirname "$0")
+	cd $(dirname "$SCRIPT_NAME")
 	brew bundle
 }
 
