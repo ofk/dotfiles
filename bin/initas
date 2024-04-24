@@ -9,7 +9,7 @@ require 'yaml'
 
 # React module
 class Starters
-  def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true,
+  def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true, workflow: true,
                   example: true, bundler: 'none', dom: 'react', style: 'jsx')
     raise "Not support bundler: #{bundler}" unless %w[none parcel].include?(bundler)
     raise "Not support dom: #{dom}" unless %w[none lib react].include?(dom)
@@ -39,6 +39,8 @@ class Starters
       end
       setup_example
     end
+
+    # setup_workflow if workflow && @test
 
     nil
   end
@@ -72,7 +74,7 @@ class Starters
     add_npm_deps %w[-D jest-environment-jsdom]
 
     commit 'Update jest config' do
-      update_file 'jest.config.js' do |text|
+      update_file 'jest.config.cjs' do |text|
         text.sub %r{// testEnvironment: ".*"}, "testEnvironment: 'jest-environment-jsdom'"
       end
     end
@@ -93,22 +95,74 @@ class Starters
           'source': 'src/index.ts'
         )
       end
+    end
+  end
 
-      FileUtils.mv('jest.config.js', 'jest.config.cjs')
+  def setup_workflow
+    commit 'Add CI workflow' do
+      update_file '.github/workflows/ci.yaml' do
+        <<~EOS
+          name: CI
+
+          on:
+            pull_request:
+
+          jobs:
+            ci:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: 18
+                - run: npm ci
+                - run: npm run lint
+                - run: npm test
+        EOS
+      end
+    end
+
+    commit 'Add publish workflow' do
+      update_file '.github/workflows/publish.yaml' do
+        <<~EOS
+          name: Publish package
+
+          on:
+            release:
+              type: published
+
+          jobs:
+            build:
+              runs-on: ubuntu-latest
+              permissions:
+                contents: read
+                packages: write
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: 18
+                    registry-url: 'https://registry.npmjs.org'
+                - run: npm ci
+                - run: npm publish
+                  env:
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        EOS
+      end
     end
   end
 
   def setup_react
-    deps = %w[react react-dom]
+    deps = %w[react]
     deps << '@emotion/css' if @style == 'jsx'
-    dev_deps = %w[@types/react @types/react-dom]
+    dev_deps = %w[@types/react]
 
     add_npm_deps ['-D', *deps, *dev_deps]
 
-    commit 'Add react and react-dom into peerDeps' do
+    commit 'Add react into peerDeps' do
       update_package_json do |pkg|
         pkg.merge(
-          'peerDependencies' => pkg['devDependencies'].filter { |k, _v| %w[react react-dom].include?(k) }
+          'peerDependencies' => pkg['devDependencies'].filter { |k, _v| %w[react].include?(k) }
         )
       end
     end
@@ -262,6 +316,8 @@ class Starters
   end
 
   def setup_react_example
+    add_npm_deps %w[-D react-dom @types/react-dom]
+
     commit 'Add examples' do
       update_json_file 'examples/.eslintrc.json' do
         {
@@ -370,7 +426,7 @@ class Starters
 
     setup_npm
     setup_prettier
-    setup_husky_and_lint_stage if @pre_commit_hook
+    setup_husky_and_lint_staged if @pre_commit_hook
     setup_typescript_with_prettier
     setup_eslint_with_prettier
     setup_jest if @test
@@ -404,11 +460,14 @@ class Starters
     add_npm_deps %w[-D npm-run-all prettier prettier-package-json]
 
     commit 'Add lint{,-fix} command' do
-      update_json_file '.prettierrc.json' do
-        {
-          'printWidth' => 100,
-          'singleQuote' => true
-        }
+      update_file 'prettier.config.cjs' do
+        <<~EOS
+          /** @type {import("prettier").Config} */
+          module.exports = {
+            "printWidth": 100,
+            "singleQuote": true
+          };
+        EOS
       end
 
       update_package_json do |pkg|
@@ -431,7 +490,7 @@ class Starters
     end
   end
 
-  def setup_husky_and_lint_stage
+  def setup_husky_and_lint_staged
     add_npm_deps %w[-D husky lint-staged] do
       `npm run lint-fix`
     end
@@ -441,27 +500,17 @@ class Starters
         pkg.merge(
           'lint-staged' => {
             'package.json' => 'prettier-package-json --write',
-            '*.{md,json,html}' => 'prettier --write'
+            '*.{cjs,json,md,html}' => 'prettier --write'
           }
         )
       end
       `npm run lint-fix`
     end
 
-    run_npm_dep %w[husky install] do
-      update_package_json do |pkg|
-        pkg.merge(
-          'scripts' => (pkg['scripts'] || {}).merge(
-            {
-              'prepare' => 'husky install'
-            }
-          )
-        )
-      end
-      `npm run lint-fix`
+    commit 'Setup husky and lint-staged' do
+      `npx husky init`
+      `echo "npx lint-staged" > .husky/pre-commit`
     end
-
-    run_npm_dep ['husky', 'add', '.husky/pre-commit', '"npx lint-staged"']
   end
 
   def setup_typescript_with_prettier
@@ -527,12 +576,12 @@ class Starters
   end
 
   def setup_eslint_with_prettier
-    add_npm_deps %w[-D eslint @ofk/eslint-config-recommend
-                    @typescript-eslint/eslint-plugin@^6.0.0
-                    @typescript-eslint/parser@^6.0.0]
+    add_npm_deps %w[-D eslint@^8.0.0 @ofk/eslint-config-recommend
+                    @typescript-eslint/eslint-plugin@^7.0.0
+                    @typescript-eslint/parser@^7.0.0]
 
     commit 'Add lint{,-fix}:eslint command' do
-      update_eslintrc_json do
+      update_json_file '.eslintrc.json' do
         {
           'root' => true,
           'env' => {
@@ -541,7 +590,7 @@ class Starters
           },
           'extends' => '@ofk/eslint-config-recommend',
           'parserOptions' => {
-            'project' => './tsconfig.json'
+            'project' => true
           }
         }
       end
@@ -594,7 +643,8 @@ class Starters
         "
       EOS
       `#{jest_init_cmd}`
-      update_file 'jest.config.js' do |text|
+      FileUtils.mv('jest.config.js', 'jest.config.cjs')
+      update_file 'jest.config.cjs' do |text|
         text.sub %r{// preset: undefined}, "preset: 'ts-jest'"
       end
       update_file 'tsconfig.json' do |text|
@@ -604,6 +654,9 @@ class Starters
         paths + %w[coverage]
       end
       copy_ignore_files
+      # update_ignore_file '.eslintignore' do |paths|
+      #   paths + %w[*.config.*js]
+      # end
     end
   end
 
@@ -650,12 +703,6 @@ class Starters
                        dependencies devDependencies peerDependencies
                        bundledDependencies optionalDependencies
                        engines engineStrict os cpu preferGlobal publishConfig
-                     ], &block)
-  end
-
-  def update_eslintrc_json(&block)
-    update_json_file('.eslintrc.json', %w[
-                       root parserOptions env extends plugins settings globals rules overrides
                      ], &block)
   end
 
