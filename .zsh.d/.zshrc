@@ -125,7 +125,6 @@ linux*)
 	;;
 esac
 
-alias ll='ls -lah'
 alias su='su -l'
 alias cp='cp -iv'
 alias mv='mv -iv'
@@ -136,6 +135,14 @@ alias 'cd-'='cd -'
 alias 'cd..'='cd ..'
 
 export LESS='-iMR'
+
+function ll {
+	if [ $# -eq 1 -a -f $1 ]; then
+		less $1
+	else
+		ls -lah $@
+	fi
+}
 
 if type emacs &>/dev/null; then
 	EDITOR=emacs
