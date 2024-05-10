@@ -3,3 +3,4 @@ Brewfile.lock.json
 /.emacs.d/ac-comphist.dat
 /.emacs.d/custom.el
 /.emacs.d/elpa/
+/.zsh.d/ni.zsh

@@ -104,6 +104,17 @@ setopt complete_in_word
 # other
 REPORTTIME=3
 
+# ni
+NI_PATH=$(dirname $0)/ni.zsh
+
+if [ ! -f "${NI_PATH}" ]; then
+	curl -o "${NI_PATH}" https://raw.githubusercontent.com/azu/ni.zsh/main/ni.zsh
+fi
+
+if [ -f "${NI_PATH}" ]; then
+	source "${NI_PATH}"
+fi
+
 # alias
 case ${OSTYPE} in
 freebsd* | darwin*)
