@@ -230,7 +230,7 @@ fi
 
 if type ffmpeg >/dev/null 2>&1; then
 	function ffmpeg-mp4 {
-		ffmpeg -i $1 -pix_fmt yuv420p ${1%.*}.mp4
+		ffmpeg -i $@ -pix_fmt yuv420p ${1%.*}.mp4
 	}
 
 	function ffmpeg-gif {
