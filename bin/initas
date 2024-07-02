@@ -23,8 +23,8 @@ class Starters
     node(manager:, scope:, test:, pre_commit_hook:)
 
     setup_mock_files
-    setup_jest_jsdom if @dom
-    setup_microbundle if @dom != 'react'
+    setup_jest_jsdom if @dom && @test
+    setup_microbundle
     setup_react if @dom == 'react'
     setup_scss if @dom && @style == 'scss'
     setup_stylelint_with_prettier if @dom && @style
@@ -88,12 +88,25 @@ class Starters
         pkg.merge(
           'type' => 'module',
           'main' => "dist/#{pkg['name']}.cjs",
+          'module' => "dist/#{pkg['name']}.module.js",
           'scripts' => (pkg['scripts'] || {}).merge(
             'build' => 'microbundle --tsconfig tsconfig.build.json'
           ),
           'browserslist' => ['since 2017-06'],
           'source': 'src/index.ts'
         )
+      end
+
+      if @dom == 'react'
+        update_json_file 'tsconfig.build.json' do |config|
+          config.merge(
+            'compilerOptions' => config['compilerOptions'].merge(
+              'jsx' => 'react',
+              'jsxFactory' => '',
+              'jsxFragmentFactory' => '',
+            )
+          )
+        end
       end
     end
   end
@@ -555,14 +568,7 @@ class Starters
       update_json_file '.eslintrc.json' do
         {
           'root' => true,
-          'env' => {
-            'browser' => true,
-            'es6' => true
-          },
           'extends' => '@ofk/eslint-config-recommend',
-          'parserOptions' => {
-            'project' => true
-          }
         }
       end
 
