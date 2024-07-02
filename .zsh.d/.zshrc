@@ -181,6 +181,15 @@ if type git &>/dev/null; then
 	}
 fi
 
+if type corepack &>/dev/null; then
+	alias yarn="corepack yarn"
+	alias yarnpkg="corepack yarnpkg"
+	alias pnpm="corepack pnpm"
+	alias pnpx="corepack pnpx"
+	alias npm="corepack npm"
+	alias npx="corepack npx"
+fi
+
 if type bundle &>/dev/null; then
 	alias bundle-install='bundle install --path vendor/bundle --without production'
 	alias be='bundle exec'
