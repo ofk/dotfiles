@@ -29,6 +29,7 @@
     cancel = !git commit -a -m 'Temporary commit for cancel' && git reset --hard HEAD~
     release = "!f(){ git commit -m \"Release $1\" && git tag -a $1 -m \"Release $1\";};f"
     init-commit = !git commit --allow-empty -m \"\\`mkdir $(basename $(pwd))\\`\"
+    pr="!f(){ git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; };f"
 
 [merge]
 	ff = false
