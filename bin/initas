@@ -9,7 +9,7 @@ require 'yaml'
 
 # React module
 class Starters
-  def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true, workflow: true,
+  def node_module(manager: 'npm', scope: nil, test: true, pre_commit_hook: true, workflow: false,
                   example: true, bundler: 'none', dom: 'react', style: 'jsx')
     raise "Not support bundler: #{bundler}" unless %w[none parcel].include?(bundler)
     raise "Not support dom: #{dom}" unless %w[none lib react].include?(dom)
@@ -40,7 +40,7 @@ class Starters
       setup_example
     end
 
-    # setup_workflow if workflow && @test
+    setup_workflow if workflow && @test
 
     nil
   end
@@ -118,35 +118,6 @@ class Starters
                 - run: npm ci
                 - run: npm run lint
                 - run: npm test
-        EOS
-      end
-    end
-
-    commit 'Add publish workflow' do
-      update_file '.github/workflows/publish.yaml' do
-        <<~EOS
-          name: Publish package
-
-          on:
-            release:
-              type: published
-
-          jobs:
-            build:
-              runs-on: ubuntu-latest
-              permissions:
-                contents: read
-                packages: write
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-node@v4
-                  with:
-                    node-version: 18
-                    registry-url: 'https://registry.npmjs.org'
-                - run: npm ci
-                - run: npm publish
-                  env:
-                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         EOS
       end
     end
