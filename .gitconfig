@@ -30,6 +30,7 @@
     release = "!f(){ git commit -m \"Release $1\" && git tag -a $1 -m \"Release $1\";};f"
     init-commit = !git commit --allow-empty -m \"\\`mkdir $(basename $(pwd))\\`\"
     pr="!f(){ git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; };f"
+    delete-squshed = "!f(){ local br=$(git rev-parse --abbrev-ref HEAD); git checkout -q $br && git for-each-ref refs/heads/ \"--format=%(refname:short)\" | while read branch; do mergeBase=$(git merge-base $br $branch) && [[ $(git cherry $br $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)) == \"-\"* ]] && git branch -D $branch; done; };f"
 
 [merge]
 	ff = false
