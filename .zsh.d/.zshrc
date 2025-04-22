@@ -237,6 +237,10 @@ if type docker &>/dev/null; then
 	fi
 fi
 
+if type code >/dev/null 2>&1; then
+    alias 'code.'='code $(pwd)'
+fi
+
 if type ffmpeg >/dev/null 2>&1; then
 	function ffmpeg-mp4 {
 		ffmpeg -i $@ -pix_fmt yuv420p ${1%.*}.mp4
