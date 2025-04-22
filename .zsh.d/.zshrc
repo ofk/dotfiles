@@ -78,17 +78,16 @@ if type brew &>/dev/null; then
 		local brew_prefix=$(brew --prefix)
 		FPATH=${brew_prefix}/share/zsh-completions:${brew_prefix}/share/zsh/site-functions:${FPATH}
 
-		local asdf_path=${brew_prefix}/opt/asdf/libexec/asdf.sh
-		if [ -f "${asdf_path}" ]; then
-			source "${asdf_path}"
-			FPATH=${brew_prefix}/opt/asdf/share/zsh/site-functions:${FPATH}
-		fi
-
 		export RUBY_CONFIGURE_OPTS="--with-openssl-dir=${brew_prefix}/opt/openssl@1.1"
 	}
 
 	setup_brew
 	unset setup_brew
+fi
+
+# mise
+if type mise &>/dev/null; then
+	eval "$(mise activate zsh)"
 fi
 
 # completion

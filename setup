@@ -43,18 +43,6 @@ install_deps() {
 	brew bundle
 }
 
-install_runtimes() {
-	if ! type asdf >/dev/null 2>&1; then
-		echo "asdf not found" 1>&2
-		exit 1
-	fi
-
-	echo "Install programing runtimes"
-	asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-	asdf plugin add ruby https://github.com/asdf-vm/asdf-ruby.git
-	asdf plugin-add python
-}
-
 main() {
 	while getopts h opt; do
 		case $opt in
@@ -74,9 +62,6 @@ main() {
 		;;
 	deps)
 		install_deps
-		;;
-	runtimes)
-		install_runtimes
 		;;
 	default)
 		copy_config
