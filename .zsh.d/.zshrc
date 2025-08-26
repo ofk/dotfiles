@@ -87,7 +87,7 @@ fi
 
 # mise
 if type mise &>/dev/null; then
-	eval "$(mise activate zsh)"
+	eval "$(mise activate zsh --shims)"
 fi
 
 # completion
