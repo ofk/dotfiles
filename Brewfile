@@ -1,4 +1,3 @@
-tap "homebrew/cask-fonts"
 brew "colordiff"
 brew "emacs"
 brew "git"
