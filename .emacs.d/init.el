@@ -30,6 +30,11 @@
 
 ;;------------------------------------------------------------------------------
 ;; View
+
+;; Use dark faces on terminal.
+(when (not window-system)
+  (setq frame-background-mode 'dark))
+
 ;; hide startup message
 (setq inhibit-startup-screen t)
 
@@ -240,7 +245,7 @@
   :config
   (setq ruby-deep-indent-paren-style nil)
   (setq ruby-insert-encoding-magic-comment nil)
-  (defadvice ruby-indent-line (after unindent-closing-paren activate)
+  (define-advice ruby-indent-line (:after (&rest _) unindent-closing-paren)
     (let ((column (current-column))
           indent offset)
       (save-excursion
