@@ -15,6 +15,12 @@
 ## github/gitignore/Global/VisualStudioCode.gitignore
 .vscode
 
+## github/gitignore/Global/Agents.gitignore
+# Claude Code
+.claude/*.local.json
+.claude/**/*.log
+CLAUDE.local.md
+
 ## node
 npm-debug.log*
 yarn-debug.log*
