@@ -1,3 +1,7 @@
+if [ -f /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 export PATH=${HOME}/.local/bin/:${HOME}/.dotfiles/bin:${PATH}
 
 # keybind
@@ -162,17 +166,44 @@ if type git &>/dev/null; then
 	alias gg='git grep'
 	alias gst='git --no-pager status --short --branch && git --no-pager stash list'
 
-	function gstf {
-		git --no-pager status --short | awk -v q="${1}" "BEGIN{n=int(q);if(n\"\"!=q)n=0;if(q==\"0\")q=\"\"}{if(n==0?\$2~q:NR==n)print\$2}"
-	}
+    function gstf {
+        local -a raw files picked
+        local i=1 x n
 
-	function gsta {
-		git add "${@:2}" $(gstf "${1}")
-	}
+        raw=("${(@0)$(git status --porcelain=v1 -z)}")
 
-	function gstd {
-		git diff --indent-heuristic --ignore-space-change --histogram "${@:2}" -- $(gstf "${1}")
-	}
+        while (( i <= $#raw )); do
+            x=${raw[$i]}
+            [[ -z $x ]] && break
+
+            files+=("${x[4,-1]}")
+
+            [[ $x[1] == [RC] || $x[2] == [RC] ]] && (( i++ ))
+            (( i++ ))
+        done
+
+        if (( $# == 0 )); then
+            picked=("${files[@]}")
+        else
+            for n in "$@"; do
+                if (( n < 1 || n > $#files )); then
+                    picked=("${files[@]}")
+                    break
+                fi
+                picked+=("${files[$n]}")
+            done
+        fi
+
+        print -rC1 -- "${picked[@]}"
+    }
+
+    function gsta {
+        git add -- "${(f)$(gstf "$@")}"
+    }
+
+    function gstd {
+        git diff --indent-heuristic --ignore-space-change HEAD -- "${(f)$(gstf "$@")}"
+    }
 
 	function git-user-config {
 		git config user.name "${1}"
